@@ -19,7 +19,6 @@ class Histogram {
   }
 
   initVis() {
-      
     let vis = this; //this is a keyword that can go out of scope, especially in callback functions, 
                     //so it is good to create a variable that is a reference to 'this' class instance
 
@@ -27,6 +26,7 @@ class Histogram {
     vis.nBins = this.config.nBins;
     vis.dataAttribute = this.config.dataAttribute;
     vis.year = this.config.year;
+    vis.title = this.config.chartTitle;
 
     //set up the width and height of the area where visualizations will go- factoring in margins               
     vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
@@ -42,7 +42,6 @@ class Histogram {
       .value((d) => d[vis.dataAttribute])
     (this.data);
 
-    console.log(bins)
     // TODO: Confirm sizing and margins
     const x = d3.scaleLinear()
         .domain([bins[0].x0, bins[bins.length - 1].x1])
@@ -50,7 +49,7 @@ class Histogram {
 
     const y = d3.scaleLinear()
         .domain([0, d3.max(bins, (d) => d.length)])
-        .range([vis.height + vis.config.margin.top, vis.config.margin.bottom]);
+        .range([vis.height - vis.config.margin.bottom, vis.config.margin.top]);
   
     const svg = d3.select(vis.config.parentElement)
         .attr("width", vis.width)
@@ -58,6 +57,7 @@ class Histogram {
         .attr("viewBox", [0, 0, vis.width, vis.height])
         .attr("style", "max-width: 100%; height: auto;");
   
+    // Add the histogram as a group to the svg
     svg.append("g")
         .attr("fill", "steelblue")
         .selectAll()
@@ -68,18 +68,28 @@ class Histogram {
             .attr("y", (d) => y(d.length))
             .attr("height", (d) => y(0) - y(d.length));
 
+    // Add the x-axis as a group to the svg
     svg.append("g")
-        .attr("transform", `translate(0,${vis.height - vis.config.margin.bottom})`)
+        .attr("transform", `translate(0, ${vis.height - vis.config.margin.bottom})`)
         .call(d3.axisBottom(x).ticks(vis.width / 80).tickSizeOuter(0))
         .call((g) => g.append("text")
-            .attr("x", vis.width)
-            .attr("y", vis.config.margin.bottom - 4)
+            .attr("x", vis.width / 2)
+            .attr("y", vis.config.margin.bottom - 2)
             .attr("fill", "currentColor")
             .attr("text-anchor", "end")
-            .text("Daily Supply of Calories"));
+            .text(vis.title));
+
+    // Add the y-axis as a group to the svg
+    svg.append("g")
+        .attr("transform", `translate(${vis.config.margin.left}, 0)`)
+        .call(d3.axisLeft(y).ticks(vis.width / 80).tickSizeOuter(0))
+        .call((g) => g.append("text")
+            .attr("x", vis.config.margin.left + 50)
+            .attr("y", 10)
+            .attr("fill", "currentColor")
+            .attr("text-anchor", "end")
+            .text("Number of Countries"));
   }
-
-
 }
 //     //reusable functions for x and y 
 //         //if you reuse a function frequetly, you can define it as a parameter

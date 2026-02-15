@@ -1,7 +1,5 @@
 d3.csv("data/food/daily_calories_per_capita/data.csv")
   .then(data => {
-    console.log(data);
-
   	// Create an instance (for example in main.js)
 	let calorie_histogram = new Histogram({
 		"parentElement": "#calories-available-distribution",
