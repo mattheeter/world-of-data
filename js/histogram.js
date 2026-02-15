@@ -4,7 +4,7 @@ class Histogram {
     this.config = {
       parentElement: _config.parentElement,
       chartTitle: _config.chartTitle,
-      containerWidth: _config.containerWidth || 960,
+      containerWidth: _config.containerWidth || 1200,
       containerHeight: _config.containerHeight || 500,
       nBins: _config.nBins || 20,
       year: _config.year || 2020,

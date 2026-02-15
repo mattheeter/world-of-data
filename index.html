@@ -1,35 +1,32 @@
-<!DOCTYPE HTML>
+<!DOCTYPE html>
 <html>
-	<head>
-		<title>Generic - Phantom by HTML5 UP</title>
-		<meta charset="utf-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
-		<link rel="stylesheet" href="assets/css/main.css" />
-		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
-	</head>
-	<body class="is-preload">
-		<!-- Wrapper -->
-			<div id="wrapper">
+<head>
+    <title>D3 Project Starter Template</title>
+    <meta charset="UTF-8">
+    <link rel="icon" href="data:;base64,iVBORwOKGO=" />
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>    
+    <!-- Add HTML content, SVG drawing area, ... -->
 
-				<!-- Main -->
-					<div id="main">
-						<div class="inner">
-                            <h1>Food Abundance's Effects on Health - Matt Heeter</h1>
-                            <h2>Daily Supply of Calories Available</h2>
-							<span class="image main"><svg id="calories-available-distribution"></svg></span>
-                            <h2>Life Expectancy from Birth</h2>
-							<span class="image main"><svg id="life-expectancy-distribution"></svg></span>
-						</div>
-					</div>
+    <h1>Food Abundance's Effects on Health - Matt Heeter</h1>
+    <div class="histogram-container" id="distributions">
+        <div>
+            <h2>Daily Supply of Calories Available</h2>
+            <svg id="calories-available-distribution"></svg>
+        </div>
+        <div>
+            <h2>Life Expectancy from Birth</h2>
+	        <svg id="life-expectancy-distribution"></svg>
+        </div>
+    </div>
+ 
+    <!-- D3 bundle -->
+    <script src="js/d3.v6.min.js"></script>
 
-			</div>
+    <!-- Our JS code - INCLUDING the new files-->
+    <script src="js/main.js"></script>
+    <script src="js/histogram.js"></script> 
 
-        <!-- D3 bundle -->
-        <script src="js/d3.v6.min.js"></script>
-
-        <!-- Our JS code - INCLUDING the new files-->
-        <script src="js/main.js"></script>
-        <script src="js/histogram.js"></script> 
-        
-	</body>
+</body>
 </html>
