@@ -3,6 +3,7 @@ class Histogram {
   constructor(_config, _data) {
     this.config = {
       parentElement: _config.parentElement,
+      chartTitle: _config.chartTitle,
       containerWidth: _config.containerWidth || 960,
       containerHeight: _config.containerHeight || 500,
       nBins: _config.nBins || 20,
