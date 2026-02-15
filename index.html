@@ -10,23 +10,33 @@
     <!-- Add HTML content, SVG drawing area, ... -->
 
     <h1>Food Abundance's Effects on Health - Matt Heeter</h1>
-    <div class="histogram-container" id="distributions">
-        <div>
-            <h2>Daily Supply of Calories Available</h2>
-            <svg id="calories-available-distribution"></svg>
+
+    <div id="level-1">
+        <div class="multi-chart-container" id="distributions">
+            <div>
+                <h2 class="chart-title">Daily Supply of Calories Available</h2>
+                <svg id="calories-available-distribution"></svg>
+            </div>
+            
+            <div>
+                <h2 class="chart-title">Life Expectancy from Birth</h2>
+	            <svg id="life-expectancy-distribution"></svg>
+            </div>
         </div>
-        <div>
-            <h2>Life Expectancy from Birth</h2>
-	        <svg id="life-expectancy-distribution"></svg>
+        
+        <div class="multi-chart-container" id="correlation">
+            <h2 class="chart-title">Calories Avaialable vs. Life Expectancy</h2>
+            <svg id="calories-life-expectancy-correlation"></svg>
         </div>
     </div>
- 
+
     <!-- D3 bundle -->
     <script src="js/d3.v6.min.js"></script>
 
     <!-- Our JS code - INCLUDING the new files-->
     <script src="js/main.js"></script>
     <script src="js/histogram.js"></script> 
+    <script src="js/scatter_plot.js"></script> 
 
 </body>
 </html>

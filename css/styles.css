@@ -1,5 +1,9 @@
-.histogram-container {
+.multi-chart-container {
   display: flex; /* Aligns child elements side by side */
   justify-content: center; /* Centers the SVGs horizontally (optional) */
   gap: 20px; /* Adds space between the SVGs (optional) */
+}
+
+.chart-title {
+  text-align: center;
 }
