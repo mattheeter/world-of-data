@@ -1,18 +1,19 @@
 class ScatterPlot {
 
-  constructor(_config, _data) {
+  constructor(_config, _xData, _yData) {
     this.config = {
       parentElement: _config.parentElement,
       chartTitle: _config.chartTitle,
       containerWidth: _config.containerWidth || 1200,
       containerHeight: _config.containerHeight || 500,
-      nBins: _config.nBins || 20,
       year: _config.year || 2020,
-      dataAttribute: _config.dataAttribute,
+      xDataAttribute: _config.xDataAttribute,
+      yDataAttribute: _config.yDataAttribute,
       margin: { top: 10, bottom: 30, right: 50, left: 50 },
     }
 
-    this.data = _data;
+    this.xData = _xData;
+    this.yData = _yData;
 
     // Call a class function
     this.initVis();
@@ -22,9 +23,8 @@ class ScatterPlot {
     let vis = this; //this is a keyword that can go out of scope, especially in callback functions, 
                     //so it is good to create a variable that is a reference to 'this' class instance
 
-    // Use constructor argument for nBins so that we can easily update it
-    vis.nBins = this.config.nBins;
-    vis.dataAttribute = this.config.dataAttribute;
+    vis.xDataAttribute = this.config.xDataAttribute;
+    vis.yDataAttribute = this.config.yDataAttribute;
     vis.year = this.config.year;
     vis.title = this.config.chartTitle;
 
@@ -32,41 +32,36 @@ class ScatterPlot {
     vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
     vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
 
+    // Combine the data with (year, country) as the key
+    // Mapping from (year, country) to yData
+    let yMap = new Map();
+    vis.yData.forEach(
+        d => yMap.set(d.Year + " " +  d.Code, d[vis.yDataAttribute])
+    )
+
+    // For each xData point, set the yData attribute
+    vis.data = structuredClone(vis.xData)
+    vis.data.forEach(
+        (d, i) => vis.data[i][vis.yDataAttribute] = yMap.get(d.Year + " " +  d.Code)
+    )
+
     vis.data = vis.data.filter(
         d => parseInt(d.Year) == vis.year
     )
 
-    // Create bins for the data
-    let bins = d3.bin()
-      .thresholds(vis.nBins)
-      .value((d) => d[vis.dataAttribute])
-    (this.data);
-
-    // TODO: Confirm sizing and margins
     const x = d3.scaleLinear()
-        .domain([bins[0].x0, bins[bins.length - 1].x1])
+        .domain(d3.extent(vis.data, d => d[vis.xDataAttribute])).nice()
         .range([vis.config.margin.right, vis.width - vis.config.margin.left]);
 
     const y = d3.scaleLinear()
-        .domain([0, d3.max(bins, (d) => d.length)])
+        .domain(d3.extent(vis.data, d => d[vis.yDataAttribute])).nice()
         .range([vis.height - vis.config.margin.bottom, vis.config.margin.top]);
-  
+
     const svg = d3.select(vis.config.parentElement)
         .attr("width", vis.width)
         .attr("height", vis.height)
         .attr("viewBox", [0, 0, vis.width, vis.height])
         .attr("style", "max-width: 100%; height: auto;");
-  
-    // Add the histogram as a group to the svg
-    svg.append("g")
-        .attr("fill", "steelblue")
-        .selectAll()
-        .data(bins)
-        .join("rect")
-            .attr("x", (d) => x(d.x0) + 1)
-            .attr("width", (d) => x(d.x1) - x(d.x0) - 1)
-            .attr("y", (d) => y(d.length))
-            .attr("height", (d) => y(0) - y(d.length));
 
     // Add the x-axis as a group to the svg
     svg.append("g")
@@ -89,6 +84,15 @@ class ScatterPlot {
             .attr("fill", "currentColor")
             .attr("text-anchor", "end")
             .text("Number of Countries"));
+  
+    svg.append("g")
+        .selectAll("circle")
+        .data(vis.data)
+        .join("circle")
+            .attr("fill", "steelblue")
+            .attr("cx", d => x(d[vis.xDataAttribute]))
+            .attr("cy", d => y(d[vis.yDataAttribute]))
+            .attr("r", 5);
   }
 }
 //     //reusable functions for x and y 

@@ -1,7 +1,7 @@
 d3.csv("data/food/daily_calories_per_capita/data.csv")
   .then(data => {
   	// Create an instance (for example in main.js)
-	let calorie_histogram = new Histogram({
+	let calorieHistogram = new Histogram({
 		"parentElement": "#calories-available-distribution",
         "chartTitle": "Daily Supply of Calories",
         "dataAttribute": "All food - Food available for consumption (kilocalories per day per capita)"
@@ -13,12 +13,12 @@ d3.csv("data/food/daily_calories_per_capita/data.csv")
     console.log(error);
 });
 
+
 d3.csv("data/health/life_expectancy/data.csv")
   .then(data => {
-    console.log(data);
 
   	// Create an instance (for example in main.js)
-	let calorie_histogram = new Histogram({
+	let lifeExpectancyHistogram = new Histogram({
 		"parentElement": "#life-expectancy-distribution",
         "chartTitle": "Life Expectancy at age 0",
         "dataAttribute": "Life Expectancy, age 0"
@@ -29,6 +29,31 @@ d3.csv("data/health/life_expectancy/data.csv")
     console.error('Error:');
     console.log(error);
 });
+
+
+// Construct the scatter plot
+Promise.all([
+  d3.csv("data/food/daily_calories_per_capita/data.csv"),
+  d3.csv("data/health/life_expectancy/data.csv")
+]).then(data => {
+    x = data[0];
+    y = data[1];
+
+  	// Create an instance (for example in main.js)
+	let scatterPlot = new ScatterPlot({
+		"parentElement": "#calories-life-expectancy-correlation",
+        "containerWidth": 2000,
+        "chartTitle": "Life Expectancy at age 0",
+        "xDataAttribute": "All food - Food available for consumption (kilocalories per day per capita)",
+        "yDataAttribute": "Life Expectancy, age 0",
+	}, x, y);
+})
+.catch(error => {
+    console.error('Error:');
+    console.log(error);
+});
+
+
 
 /**
  * Event listener: use color legend as filter
