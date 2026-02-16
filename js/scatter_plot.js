@@ -86,6 +86,7 @@ class ScatterPlot {
             .text("Number of Countries"));
   
     svg.append("g")
+        .attr("transform", `translate(0, ${vis.config.margin.top})`)
         .selectAll("circle")
         .data(vis.data)
         .join("circle")
@@ -93,7 +94,7 @@ class ScatterPlot {
             .attr("cx", d => x(d[vis.xDataAttribute]))
             .attr("cy", d => y(d[vis.yDataAttribute]))
             .attr("r", 5);
-  }
+    }
 }
 //     //reusable functions for x and y 
 //         //if you reuse a function frequetly, you can define it as a parameter

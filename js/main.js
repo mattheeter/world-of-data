@@ -54,7 +54,6 @@ Promise.all([
 });
 
 
-
 /**
  * Event listener: use color legend as filter
  */
