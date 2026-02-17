@@ -1,5 +1,5 @@
 {
   "typeAcquisition": {
-    "include": ["d3"]
+    "include": ["d3", "topojson"]
   }
 }

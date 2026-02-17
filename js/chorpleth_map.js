@@ -1,11 +1,11 @@
-class ScatterPlot {
+class BivariateChoroplethMap {
 
-  constructor(_config, _xData, _yData) {
+  constructor(_config, _xData, _yData, _mapData) {
     this.config = {
       parentElement: _config.parentElement,
       chartTitle: _config.chartTitle,
       containerWidth: _config.containerWidth || 1200,
-      containerHeight: _config.containerHeight || 500,
+      containerHeight: _config.containerHeight || 1100,
       year: _config.year || 2020,
       xDataAttribute: _config.xDataAttribute,
       yDataAttribute: _config.yDataAttribute,
@@ -16,14 +16,13 @@ class ScatterPlot {
 
     this.xData = _xData;
     this.yData = _yData;
+    this.mapData = _mapData;
 
-    // Call a class function
     this.initVis();
   }
 
   initVis() {
-    let vis = this; //this is a keyword that can go out of scope, especially in callback functions, 
-                    //so it is good to create a variable that is a reference to 'this' class instance
+    let vis = this;
 
     vis.xDataAttribute = this.config.xDataAttribute;
     vis.yDataAttribute = this.config.yDataAttribute;
@@ -53,51 +52,50 @@ class ScatterPlot {
         d => parseInt(d.Year) == vis.year
     )
 
-    const x = d3.scaleLinear()
-        .domain(d3.extent(vis.data, d => d[vis.xDataAttribute])).nice()
-        .range([vis.config.margin.right, vis.width - vis.config.margin.left]);
+    const xScale = d3.scaleQuantile(Array.from(vis.data, d => d[vis.xDataAttribute]), d3.range(3));
+    const yScale = d3.scaleQuantile(Array.from(vis.data, d => d[vis.yDataAttribute]), d3.range(3));
 
-    const y = d3.scaleLinear()
-        .domain(d3.extent(vis.data, d => d[vis.yDataAttribute])).nice()
-        .range([vis.height - vis.config.margin.bottom, vis.config.margin.top]);
+    // index is a mapping from each country name to its data
+    const index = d3.index(vis.data, d => d.Entity);
+
+    const projection = d3.geoMercator();
+    const path = d3.geoPath(projection)
+
+    let colors =  [
+      "#e8e8e8", "#e4acac", "#c85a5a",
+      "#b0d5df", "#ad9ea5", "#985356",
+      "#64acbe", "#627f8c", "#574249",
+    ]
+
+    // color takes in a data point and calculates the
+    // amount into the x and y scales to get its color
+    const color = (value) => {
+        if (!value) return "#ffffff";
+        x = value[vis.xDataAttribute]
+        y = value[vis.yDataAttribute]
+        return colors[yScale(y) + xScale(x) * 3];
+    };
 
     const svg = d3.select(vis.config.parentElement)
         .attr("width", vis.width)
         .attr("height", vis.height)
         .attr("viewBox", [0, 0, vis.width, vis.height])
         .attr("style", "max-width: 100%; height: auto;");
-
-    // Add the x-axis as a group to the svg
-    svg.append("g")
-        .attr("transform", `translate(0, ${vis.height - vis.config.margin.bottom})`)
-        .call(d3.axisBottom(x).ticks(vis.width / 80).tickSizeOuter(0))
-        .call((g) => g.append("text")
-            .attr("x", vis.width / 2)
-            .attr("y", vis.config.margin.bottom - 2)
-            .attr("fill", "currentColor")
-            .attr("text-anchor", "end")
-            .text(vis.xLabel));
-
-    // Add the y-axis as a group to the svg
-    svg.append("g")
-        .attr("transform", `translate(${vis.config.margin.left}, 0)`)
-        .call(d3.axisLeft(y).ticks(vis.width / 80).tickSizeOuter(0))
-        .call((g) => g.append("text")
-            .attr("x", vis.config.margin.left + 50)
-            .attr("y", 10)
-            .attr("fill", "currentColor")
-            .attr("text-anchor", "end")
-            .text(vis.yLabel));
   
     svg.append("g")
-        .attr("transform", `translate(0, ${vis.config.margin.top})`)
-        .selectAll("circle")
-        .data(vis.data)
-        .join("circle")
-            .attr("fill", "steelblue")
-            .attr("cx", d => x(d[vis.xDataAttribute]))
-            .attr("cy", d => y(d[vis.yDataAttribute]))
-            .attr("r", 5);
+        .attr(
+            "transform",
+            `translate(200, ${vis.config.margin.top + 350})
+            scale(1.6, 1.6)`
+        )
+        .selectAll("path")
+        .data(vis.mapData.features)
+        .join("path")
+            .attr("fill", d => color(index.get(d.properties.name)))
+            .attr("d", path)
+
+    svg.append(legend)
+        .attr("transform", "translate(870,450)");
     }
 }
 //     //reusable functions for x and y 
@@ -189,3 +187,23 @@ class ScatterPlot {
 
 
 // }
+
+legend = () => {
+  const k = 24;
+  const arrow = DOM.uid();
+  return svg`<g font-family=sans-serif font-size=10>
+  <g transform="translate(-${k * n / 2},-${k * n / 2}) rotate(-45 ${k * n / 2},${k * n / 2})">
+    <marker id="${arrow.id}" markerHeight=10 markerWidth=10 refX=6 refY=3 orient=auto>
+      <path d="M0,0L9,3L0,6Z" />
+    </marker>
+    ${d3.cross(d3.range(n), d3.range(n)).map(([i, j]) => svg`<rect width=${k} height=${k} x=${i * k} y=${(n - 1 - j) * k} fill=${colors[j * n + i]}>
+      <title>Diabetes${labels[j] && ` (${labels[j]})`}
+Obesity${labels[i] && ` (${labels[i]})`}</title>
+    </rect>`)}
+    <line marker-end="${arrow}" x1=0 x2=${n * k} y1=${n * k} y2=${n * k} stroke=black stroke-width=1.5 />
+    <line marker-end="${arrow}" y2=0 y1=${n * k} stroke=black stroke-width=1.5 />
+    <text font-weight="bold" dy="0.71em" transform="rotate(90) translate(${n / 2 * k},6)" text-anchor="middle">Diabetes</text>
+    <text font-weight="bold" dy="0.71em" transform="translate(${n / 2 * k},${n * k + 6})" text-anchor="middle">Obesity</text>
+  </g>
+</g>`;
+}

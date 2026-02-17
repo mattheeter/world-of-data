@@ -34,7 +34,7 @@ d3.csv("data/health/life_expectancy/data.csv")
 // Construct the scatter plot
 Promise.all([
   d3.csv("data/food/daily_calories_per_capita/data.csv"),
-  d3.csv("data/health/life_expectancy/data.csv")
+  d3.csv("data/health/life_expectancy/data.csv"),
 ]).then(data => {
     x = data[0];
     y = data[1];
@@ -46,6 +46,8 @@ Promise.all([
         "chartTitle": "Life Expectancy at age 0",
         "xDataAttribute": "All food - Food available for consumption (kilocalories per day per capita)",
         "yDataAttribute": "Life Expectancy, age 0",
+        "xLabel": "Daily Supply of Calories",
+        "yLabel": "Life Expectancy at age 0",
 	}, x, y);
 })
 .catch(error => {
@@ -53,6 +55,32 @@ Promise.all([
     console.log(error);
 });
 
+
+// Construct the chorpleth map
+Promise.all([
+  d3.csv("data/food/daily_calories_per_capita/data.csv"),
+  d3.csv("data/health/life_expectancy/data.csv"),
+  d3.json("data/map/data.json"),
+]).then(data => {
+    x = data[0];
+    y = data[1];
+    topo = data[2];
+
+  	// Create an instance (for example in main.js)
+	let choropleth = new BivariateChoroplethMap({
+		"parentElement": "#map",
+        "containerWidth": 2000,
+        "chartTitle": "Life Expectancy at age 0",
+        "xDataAttribute": "All food - Food available for consumption (kilocalories per day per capita)",
+        "yDataAttribute": "Life Expectancy, age 0",
+        "xLabel": "Daily Supply of Calories",
+        "yLabel": "Life Expectancy at age 0",
+	}, x, y, topo);
+})
+.catch(error => {
+    console.error('Error:');
+    console.log(error);
+});
 
 /**
  * Event listener: use color legend as filter
