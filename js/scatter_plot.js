@@ -69,11 +69,11 @@ class ScatterPlot {
     )
 
     const x = d3.scaleLinear()
-        .domain(d3.extent(vis.data, d => d[vis.xDataAttribute])).nice()
+        .domain(d3.extent(vis.data, d => Number(d[vis.xDataAttribute]))).nice()
         .range([vis.config.margin.right, vis.width - vis.config.margin.left]);
 
     const y = d3.scaleLinear()
-        .domain(d3.extent(vis.data, d => d[vis.yDataAttribute])).nice()
+        .domain(d3.extent(vis.data, d => Number(d[vis.yDataAttribute]))).nice()
         .range([vis.height - vis.config.margin.bottom, vis.config.margin.top]);
 
     // Add the x-axis as a group to the svg
@@ -104,8 +104,8 @@ class ScatterPlot {
         .data(vis.data)
         .join("circle")
             .attr("fill", "steelblue")
-            .attr("cx", d => x(d[vis.xDataAttribute]))
-            .attr("cy", d => y(d[vis.yDataAttribute]))
+            .attr("cx", d => x(Number(d[vis.xDataAttribute])))
+            .attr("cy", d => y(Number(d[vis.yDataAttribute])))
             .attr("r", 5);
     }
 }

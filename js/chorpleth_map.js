@@ -50,7 +50,7 @@ class BivariateChoroplethMap {
     )
 
     const scale = d3.scaleQuantile()
-        .domain(d3.extent(Array.from(vis.data, d => d[vis.dataAttribute])))
+        .domain(d3.extent(Array.from(vis.data, d => Number(d[vis.dataAttribute]))))
         .range(vis.colorScale);
 
     // index is a mapping from each country name to its data
@@ -64,7 +64,7 @@ class BivariateChoroplethMap {
     const color = (name) => {
         let value = index.get(name)
         if (!value) return "#423838"
-        return scale(value[vis.dataAttribute]);
+        return scale(Number(value[vis.dataAttribute]));
     };
 
     vis.svg.append("g")

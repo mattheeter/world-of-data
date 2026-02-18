@@ -56,7 +56,7 @@ class Histogram {
     // Create bins for the data
     let bins = d3.bin()
       .thresholds(vis.nBins)
-      .value((d) => d[vis.dataAttribute])
+      .value((d) => Number(d[vis.dataAttribute]))
     (this.data);
 
     // TODO: Confirm sizing and margins

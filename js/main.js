@@ -8,21 +8,27 @@ let xHistogram, yHistogram, scatterPlot, xChoropleth, yChoropleth;
 let dataMap = new Map();
 dataMap.set(xDataSelection, 0);
 dataMap.set(yDataSelection, 1);
+dataMap.set("Share of the population who cannot afford a healthy diet", 2);
+dataMap.set("Health expenditure per capita, PPP", 3);
 
 let labelMap = new Map();
 labelMap.set(xDataSelection, "Daily Per-Capita Supply of Calories");
 labelMap.set(yDataSelection, "Life Expectancy from Birth");
+labelMap.set("Share of the population who cannot afford a healthy diet", "% Population Cannot Afford Healthy Diet");
+labelMap.set("Health expenditure per capita, PPP", "Per-Captia Health Expenditure");
 
 
 Promise.all([
     d3.csv("data/food/daily_calories_per_capita/data.csv"),
     d3.csv("data/health/life_expectancy/data.csv"),
+    d3.csv("data/food/cannot_afford_enough/data.csv"),
+    d3.csv("data/health/healthcare_spending/data.csv"),
     d3.json("data/map/data.json"),
 ]).then(_data => {
     data = _data;
     xData = data[dataMap.get(xDataSelection)];
     yData = data[dataMap.get(yDataSelection)];
-    topoData = data[2];
+    topoData = data[data.length - 1];
 
 	xHistogram = new Histogram({
 		"parentElement": "#calories-available-distribution",
@@ -60,7 +66,7 @@ Promise.all([
         "containerWidth": 1200,
         "containerHeight": 800,
         "label": "Daily Supply of Calories",
-        colorScale: d3.schemeBlues[8],
+        colorScale: d3.schemeBlues[7],
         "dataAttribute": xDataSelection,
         "label": labelMap.get(xDataSelection),
 	}, xData, topoData);
@@ -69,7 +75,7 @@ Promise.all([
 		"parentElement": "#life-map",
         "containerWidth": 1200,
         "containerHeight": 800,
-        colorScale: d3.schemeReds[8],
+        colorScale: d3.schemeReds[7],
         "label": "Life Expectancy from 0",
         "dataAttribute": yDataSelection,
         "label": labelMap.get(yDataSelection),
