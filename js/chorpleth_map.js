@@ -57,7 +57,7 @@ class BivariateChoroplethMap {
     const svg = d3.select(vis.config.parentElement)
         .attr("width", vis.width)
         .attr("height", vis.height)
-        .attr("viewBox", [0, 0, vis.width, vis.height])
+        .attr("viewBox", [0, 0, vis.width, 625])
         .attr("style", "max-width: 100%; height: auto;");
   
     svg.append("g")
@@ -72,8 +72,34 @@ class BivariateChoroplethMap {
             .attr("fill", d => color(d.properties.name))
             .attr("d", path)
 
-    // svg.append(legend)
-    //     .attr("transform", "translate(870,450)");
+    // Build the legend
+    const boxScale = d3.scaleLinear()
+        .domain(d3.extent(scale.quantiles()))
+        .range([vis.config.margin.left, vis.width - vis.config.margin.right]);
+
+    svg.append("g")
+        .attr("transform", `translate(0, ${vis.config.margin.top + 675})`)
+        .selectAll("rect")
+        .data(scale.range())
+        .join("rect")
+        .attr("x", (d, i) => {
+            const x0 = i === 0 ? boxScale.domain()[0] : scale.quantiles()[i - 1];
+            return boxScale(x0);
+        })
+        .attr("y", vis.config.margin.top)
+        .attr("width", (d, i) => {
+            const x0 = i === 0 ? boxScale.domain()[0] : scale.quantiles()[i - 1];
+            const x1 = i < scale.quantiles().length ? scale.quantiles()[i] : boxScale.domain()[1];
+            return boxScale(x1) - boxScale(x0);
+        })
+        .attr("height", 15)
+        .attr("fill", d => d);
+
+    svg.append("g")
+        .attr("transform", `translate(0, ${vis.config.margin.top + 700})`)
+        .call(d3.axisBottom(boxScale)
+            .tickValues([0, ...scale.quantiles()])
+            .tickSize(6));
     }
 }
 //     //reusable functions for x and y 

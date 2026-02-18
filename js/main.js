@@ -70,7 +70,7 @@ Promise.all([
 	let calorie_choropleth = new BivariateChoroplethMap({
 		"parentElement": "#calorie-map",
         "containerWidth": 1200,
-        "containerHeight": 750,
+        "containerHeight": 900,
         "label": "Daily Supply of Calories",
         colorScale: d3.schemeBlues[8],
         "dataAttribute": "All food - Food available for consumption (kilocalories per day per capita)",
@@ -79,7 +79,7 @@ Promise.all([
     let life_choropleth = new BivariateChoroplethMap({
 		"parentElement": "#life-map",
         "containerWidth": 1200,
-        "containerHeight": 750,
+        "containerHeight": 900,
         colorScale: d3.schemeReds[8],
         "label": "Life Expectancy from 0",
         "dataAttribute": "Life Expectancy, age 0",
