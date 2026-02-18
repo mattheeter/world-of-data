@@ -32,6 +32,20 @@ class Histogram {
     vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
     vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
 
+    vis.svg = d3.select(vis.config.parentElement)
+        .attr("width", vis.width)
+        .attr("height", vis.height)
+        .attr("viewBox", [0, 0, vis.width, vis.height])
+        .attr("style", "max-width: 100%; height: auto;");
+
+    this.updateVis();
+  }
+  
+  updateVis() {
+    let vis = this;
+
+    vis.svg.selectAll("*").remove();
+
     vis.data = vis.data.filter(
         d => parseInt(d.Year) == vis.year
     )
@@ -51,14 +65,8 @@ class Histogram {
         .domain([0, d3.max(bins, (d) => d.length)])
         .range([vis.height - vis.config.margin.bottom, vis.config.margin.top]);
   
-    const svg = d3.select(vis.config.parentElement)
-        .attr("width", vis.width)
-        .attr("height", vis.height)
-        .attr("viewBox", [0, 0, vis.width, vis.height])
-        .attr("style", "max-width: 100%; height: auto;");
-  
     // Add the histogram as a group to the svg
-    svg.append("g")
+    vis.svg.append("g")
         .attr("fill", "steelblue")
         .selectAll()
         .data(bins)
@@ -69,7 +77,7 @@ class Histogram {
             .attr("height", (d) => y(0) - y(d.length));
 
     // Add the x-axis as a group to the svg
-    svg.append("g")
+    vis.svg.append("g")
         .attr("transform", `translate(0, ${vis.height - vis.config.margin.bottom})`)
         .call(d3.axisBottom(x).ticks(vis.width / 80).tickSizeOuter(0))
         .call((g) => g.append("text")
@@ -80,7 +88,7 @@ class Histogram {
             .text(vis.title));
 
     // Add the y-axis as a group to the svg
-    svg.append("g")
+    vis.svg.append("g")
         .attr("transform", `translate(${vis.config.margin.left}, 0)`)
         .call(d3.axisLeft(y).ticks(vis.width / 80).tickSizeOuter(0))
         .call((g) => g.append("text")
