@@ -4,7 +4,7 @@ class BivariateChoroplethMap {
     this.config = {
       parentElement: _config.parentElement,
       chartTitle: _config.chartTitle,
-      containerWidth: _config.containerWidth || 1200,
+      containerWidth: _config.containerWidth || 600,
       containerHeight: _config.containerHeight || 1100,
       year: _config.year || 2020,
       xDataAttribute: _config.xDataAttribute,
@@ -52,8 +52,13 @@ class BivariateChoroplethMap {
         d => parseInt(d.Year) == vis.year
     )
 
-    const xScale = d3.scaleQuantile(Array.from(vis.data, d => d[vis.xDataAttribute]), d3.range(3));
-    const yScale = d3.scaleQuantile(Array.from(vis.data, d => d[vis.yDataAttribute]), d3.range(3));
+    const xScale = d3.scaleQuantile()
+        .domain(d3.extent(Array.from(vis.data, d => d[vis.xDataAttribute])))
+        .range(d3.schemeBlues[5]);
+
+    const yScale = d3.scaleQuantile()
+        .domain(d3.extent(Array.from(vis.data, d => d[vis.yDataAttribute])))
+        .range(d3.schemeReds[9]);
 
     // index is a mapping from each country name to its data
     const index = d3.index(vis.data, d => d.Entity);
@@ -61,19 +66,13 @@ class BivariateChoroplethMap {
     const projection = d3.geoMercator();
     const path = d3.geoPath(projection)
 
-    let colors =  [
-      "#e8e8e8", "#e4acac", "#c85a5a",
-      "#b0d5df", "#ad9ea5", "#985356",
-      "#64acbe", "#627f8c", "#574249",
-    ]
-
     // color takes in a data point and calculates the
     // amount into the x and y scales to get its color
     const color = (value) => {
         if (!value) return "#ffffff";
         x = value[vis.xDataAttribute]
         y = value[vis.yDataAttribute]
-        return colors[yScale(y) + xScale(x) * 3];
+        return yScale(y);
     };
 
     const svg = d3.select(vis.config.parentElement)
