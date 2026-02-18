@@ -92,8 +92,8 @@ class ScatterPlot {
         .attr("transform", `translate(${vis.config.margin.left}, 0)`)
         .call(d3.axisLeft(y).ticks(vis.width / 80).tickSizeOuter(0))
         .call((g) => g.append("text")
-            .attr("x", vis.config.margin.left + 50)
-            .attr("y", 10)
+            .attr("x", vis.config.margin.left + 60)
+            .attr("y", 8)
             .attr("fill", "currentColor")
             .attr("text-anchor", "end")
             .text(vis.yLabel));

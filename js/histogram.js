@@ -3,12 +3,13 @@ class Histogram {
   constructor(_config, _data) {
     this.config = {
       parentElement: _config.parentElement,
-      chartTitle: _config.chartTitle,
       containerWidth: _config.containerWidth || 1200,
       containerHeight: _config.containerHeight || 500,
+      color: _config.color || "steelblue",
       nBins: _config.nBins || 20,
       year: _config.year || 2020,
       dataAttribute: _config.dataAttribute,
+      label: _config.label,
       margin: { top: 10, bottom: 30, right: 50, left: 50 },
     }
 
@@ -27,6 +28,8 @@ class Histogram {
     vis.dataAttribute = this.config.dataAttribute;
     vis.year = this.config.year;
     vis.title = this.config.chartTitle;
+    vis.color = this.config.color;
+    vis.label = this.config.label;
 
     //set up the width and height of the area where visualizations will go- factoring in margins               
     vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
@@ -67,7 +70,7 @@ class Histogram {
   
     // Add the histogram as a group to the svg
     vis.svg.append("g")
-        .attr("fill", "steelblue")
+        .attr("fill", vis.color)
         .selectAll()
         .data(bins)
         .join("rect")
@@ -85,7 +88,7 @@ class Histogram {
             .attr("y", vis.config.margin.bottom - 2)
             .attr("fill", "currentColor")
             .attr("text-anchor", "end")
-            .text(vis.title));
+            .text(vis.label));
 
     // Add the y-axis as a group to the svg
     vis.svg.append("g")

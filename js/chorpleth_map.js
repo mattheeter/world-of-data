@@ -25,6 +25,7 @@ class BivariateChoroplethMap {
     vis.year = this.config.year;
     vis.dataAttribute = this.config.dataAttribute
     vis.colorScale = this.config.colorScale;
+    vis.label = this.config.label;
 
     //set up the width and height of the area where visualizations will go- factoring in margins               
     vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
@@ -69,7 +70,7 @@ class BivariateChoroplethMap {
     vis.svg.append("g")
         .attr(
             "transform",
-            `translate(0, ${vis.config.margin.top + 100})
+            `translate(0, ${vis.config.margin.top + 150})
             scale(1.1, 1.1)`
         )
         .selectAll("path")
@@ -86,7 +87,7 @@ class BivariateChoroplethMap {
         .range([vis.config.margin.left, vis.width - vis.config.margin.right]);
 
     vis.svg.append("g")
-        .attr("transform", `translate(0, ${vis.config.margin.top + 600})`)
+        .attr("transform", `translate(0, ${vis.config.margin.top + 625})`)
         .selectAll("rect")
         .data(scale.range())
         .join("rect")
@@ -104,9 +105,15 @@ class BivariateChoroplethMap {
         .attr("fill", d => d);
 
     vis.svg.append("g")
-        .attr("transform", `translate(0, ${vis.config.margin.top + 625})`)
+        .attr("transform", `translate(0, ${vis.config.margin.top + 650})`)
         .call(d3.axisBottom(boxScale)
             .tickValues([0, ...scale.quantiles()])
-            .tickSize(6));
+            .tickSize(6))
+        .call((g) => g.append("text")
+            .attr("x", vis.width / 2)
+            .attr("y", vis.config.margin.bottom - 2)
+            .attr("fill", "currentColor")
+            .attr("text-anchor", "end")
+            .text(vis.label));
   }
 }

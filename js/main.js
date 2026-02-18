@@ -9,6 +9,10 @@ let dataMap = new Map();
 dataMap.set(xDataSelection, 0);
 dataMap.set(yDataSelection, 1);
 
+let labelMap = new Map();
+labelMap.set(xDataSelection, "Daily Per-Capita Supply of Calories");
+labelMap.set(yDataSelection, "Life Expectancy from Birth");
+
 
 Promise.all([
     d3.csv("data/food/daily_calories_per_capita/data.csv"),
@@ -22,45 +26,53 @@ Promise.all([
 
 	xHistogram = new Histogram({
 		"parentElement": "#calories-available-distribution",
+        "containerHeight": 300,
         "chartTitle": "Daily Supply of Calories",
         "dataAttribute": xDataSelection,
+        "label": labelMap.get(xDataSelection),
 	}, xData);
 
 
 	yHistogram = new Histogram({
 		"parentElement": "#life-expectancy-distribution",
+        "containerHeight": 300,
+        "color": "#ca4227",
         "chartTitle": "Life Expectancy at age 0",
         "dataAttribute": yDataSelection,
+        "label": labelMap.get(yDataSelection),
 	}, yData);
 
   	// Create an instance (for example in main.js)
 	scatterPlot = new ScatterPlot({
 		"parentElement": "#calories-life-expectancy-correlation",
+        "containerHeight": 300,
         "containerWidth": 2000,
         "chartTitle": "Life Expectancy at age 0",
         "xDataAttribute": xDataSelection,
         "yDataAttribute": yDataSelection,
-        "xLabel": "Daily Supply of Calories",
-        "yLabel": "Life Expectancy at age 0",
+        "xLabel": labelMap.get(xDataSelection),
+        "yLabel": labelMap.get(yDataSelection),
 	}, xData, yData);
 
   	// Create an instance (for example in main.js)
 	xChoropleth = new BivariateChoroplethMap({
 		"parentElement": "#calorie-map",
         "containerWidth": 1200,
-        "containerHeight": 900,
+        "containerHeight": 800,
         "label": "Daily Supply of Calories",
         colorScale: d3.schemeBlues[8],
         "dataAttribute": xDataSelection,
+        "label": labelMap.get(xDataSelection),
 	}, xData, topoData);
 
     yChoropleth = new BivariateChoroplethMap({
 		"parentElement": "#life-map",
         "containerWidth": 1200,
-        "containerHeight": 900,
+        "containerHeight": 800,
         colorScale: d3.schemeReds[8],
         "label": "Life Expectancy from 0",
         "dataAttribute": yDataSelection,
+        "label": labelMap.get(yDataSelection),
 	}, yData, topoData);
 })
 .catch(error => {
@@ -76,17 +88,21 @@ d3.select("#x-button").on("click", function() {
     }
     xDataSelection = this.value;
     newData = data[dataMap.get(xDataSelection)];
+    newLabel = labelMap.get(xDataSelection);
 
     xHistogram.data = newData;
     xHistogram.dataAttribute = xDataSelection;
+    xHistogram.label = newLabel;
     xHistogram.updateVis();
 
     scatterPlot.xData = newData;
     scatterPlot.xDataAttribute = xDataSelection;
+    scatterPlot.xLabel = newLabel;
     scatterPlot.updateVis();
 
     xChoropleth.data = newData;
     xChoropleth.dataAttribute = xDataSelection;
+    xChoropleth.label = newLabel;
     xChoropleth.updateVis();
 });
 
@@ -98,16 +114,20 @@ d3.select("#y-button").on("click", function() {
     }
     yDataSelection = this.value;
     newData = data[dataMap.get(yDataSelection)];
+    newLabel = labelMap.get(yDataSelection);
 
     yHistogram.data = newData;
     yHistogram.dataAttribute = yDataSelection;
+    yHistogram.label = newLabel;
     yHistogram.updateVis();
 
     scatterPlot.yData = newData;
     scatterPlot.yDataAttribute = yDataSelection;
+    scatterPlot.yLabel = newLabel;
     scatterPlot.updateVis();
 
     yChoropleth.data = newData;
     yChoropleth.dataAttribute = yDataSelection;
+    yChoropleth.label = newLabel;
     yChoropleth.updateVis();
 });
