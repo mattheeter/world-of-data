@@ -7,3 +7,7 @@
 .chart-title {
   text-align: center;
 }
+
+.data-selector {
+    position: fixed;
+}

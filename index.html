@@ -10,6 +10,20 @@
     <!-- Add HTML content, SVG drawing area, ... -->
 
     <h1>Food Availability's Effects on Health - Matt Heeter</h1>
+    <div class="data-selector">
+        <label>Independent Variable Name:</label>
+        <select id="x-button">
+            <option value="data/food/daily_calories_per_capita/data.csv">Per Capita Calories</option>
+            <option value="data/health/life_expectancy/data.csv">Life Expectancy at Birth</option>
+        </select>
+
+        <br>
+        <label>Dependent Variable Name:</label>
+        <select id="y-button">
+            <option value="data/health/life_expectancy/data.csv">Life Expectancy at Birth</option>
+            <option value="data/food/daily_calories_per_capita/data.csv">Per Capita Calories</option>
+        </select>
+    </div>
 
     <div id="level-1">
         <div class="multi-chart-container" id="distributions">
