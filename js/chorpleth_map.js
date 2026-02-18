@@ -34,7 +34,6 @@ class BivariateChoroplethMap {
         d => parseInt(d.Year) == vis.year
     )
 
-    console.log(vis.data)
     const scale = d3.scaleQuantile()
         .domain(d3.extent(Array.from(vis.data, d => d[vis.dataAttribute])))
         .range(vis.colorScale);
@@ -49,7 +48,6 @@ class BivariateChoroplethMap {
     // amount into the x and y scales to get its color
     const color = (name) => {
         let value = index.get(name)
-        if (!value) console.log(name);
         if (!value) return "#423838"
         return scale(value[vis.dataAttribute]);
     };
@@ -63,12 +61,14 @@ class BivariateChoroplethMap {
     svg.append("g")
         .attr(
             "transform",
-            `translate(0, ${vis.config.margin.top + 200})
+            `translate(0, ${vis.config.margin.top + 100})
             scale(1.1, 1.1)`
         )
         .selectAll("path")
         .data(vis.mapData.features)
         .join("path")
+            .attr("stroke", "white")
+            .attr("stroke-width", "0.5")
             .attr("fill", d => color(d.properties.name))
             .attr("d", path)
 
@@ -78,7 +78,7 @@ class BivariateChoroplethMap {
         .range([vis.config.margin.left, vis.width - vis.config.margin.right]);
 
     svg.append("g")
-        .attr("transform", `translate(0, ${vis.config.margin.top + 675})`)
+        .attr("transform", `translate(0, ${vis.config.margin.top + 600})`)
         .selectAll("rect")
         .data(scale.range())
         .join("rect")
@@ -96,7 +96,7 @@ class BivariateChoroplethMap {
         .attr("fill", d => d);
 
     svg.append("g")
-        .attr("transform", `translate(0, ${vis.config.margin.top + 700})`)
+        .attr("transform", `translate(0, ${vis.config.margin.top + 625})`)
         .call(d3.axisBottom(boxScale)
             .tickValues([0, ...scale.quantiles()])
             .tickSize(6));
