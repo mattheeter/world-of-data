@@ -56,26 +56,34 @@ Promise.all([
 });
 
 
-// Construct the chorpleth map
+// Construct the chorpleth maps
 Promise.all([
   d3.csv("data/food/daily_calories_per_capita/data.csv"),
   d3.csv("data/health/life_expectancy/data.csv"),
   d3.json("data/map/data.json"),
 ]).then(data => {
-    x = data[0];
-    y = data[1];
+    cals = data[0];
+    life = data[1];
     topo = data[2];
 
   	// Create an instance (for example in main.js)
-	let choropleth = new BivariateChoroplethMap({
-		"parentElement": "#map",
-        "containerWidth": 2000,
-        "chartTitle": "Life Expectancy at age 0",
-        "xDataAttribute": "All food - Food available for consumption (kilocalories per day per capita)",
-        "yDataAttribute": "Life Expectancy, age 0",
-        "xLabel": "Daily Supply of Calories",
-        "yLabel": "Life Expectancy at age 0",
-	}, x, y, topo);
+	let calorie_choropleth = new BivariateChoroplethMap({
+		"parentElement": "#calorie-map",
+        "containerWidth": 1200,
+        "containerHeight": 750,
+        "label": "Daily Supply of Calories",
+        colorScale: d3.schemeBlues[8],
+        "dataAttribute": "All food - Food available for consumption (kilocalories per day per capita)",
+	}, cals, topo);
+
+    let life_choropleth = new BivariateChoroplethMap({
+		"parentElement": "#life-map",
+        "containerWidth": 1200,
+        "containerHeight": 750,
+        colorScale: d3.schemeReds[8],
+        "label": "Life Expectancy from 0",
+        "dataAttribute": "Life Expectancy, age 0",
+	}, life, topo);
 })
 .catch(error => {
     console.error('Error:');

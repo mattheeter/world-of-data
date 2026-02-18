@@ -1,21 +1,18 @@
 class BivariateChoroplethMap {
 
-  constructor(_config, _xData, _yData, _mapData) {
+  constructor(_config, _data, _mapData) {
     this.config = {
       parentElement: _config.parentElement,
-      chartTitle: _config.chartTitle,
-      containerWidth: _config.containerWidth || 600,
+      containerWidth: _config.containerWidth || 1200,
       containerHeight: _config.containerHeight || 1100,
+      colorScale: _config.colorScale,
       year: _config.year || 2020,
-      xDataAttribute: _config.xDataAttribute,
-      yDataAttribute: _config.yDataAttribute,
-      xLabel: _config.xLabel,
-      yLabel: _config.yLabel,
+      dataAttribute: _config.dataAttribute,
+      label: _config.label,
       margin: { top: 10, bottom: 30, right: 50, left: 50 },
     }
 
-    this.xData = _xData;
-    this.yData = _yData;
+    this.data = _data;
     this.mapData = _mapData;
 
     this.initVis();
@@ -24,41 +21,23 @@ class BivariateChoroplethMap {
   initVis() {
     let vis = this;
 
-    vis.xDataAttribute = this.config.xDataAttribute;
-    vis.yDataAttribute = this.config.yDataAttribute;
-    vis.xLabel = this.config.xLabel;
-    vis.yLabel = this.config.yLabel;
+    vis.label = this.config.label;
     vis.year = this.config.year;
-    vis.title = this.config.chartTitle;
+    vis.dataAttribute = this.config.dataAttribute
+    vis.colorScale = this.config.colorScale;
 
     //set up the width and height of the area where visualizations will go- factoring in margins               
     vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
     vis.height = vis.config.containerHeight - vis.config.margin.top - vis.config.margin.bottom;
 
-    // Combine the data with (year, country) as the key
-    // Mapping from (year, country) to yData
-    let yMap = new Map();
-    vis.yData.forEach(
-        d => yMap.set(d.Year + " " +  d.Code, d[vis.yDataAttribute])
-    )
-
-    // For each xData point, set the yData attribute
-    vis.data = structuredClone(vis.xData)
-    vis.data.forEach(
-        (d, i) => vis.data[i][vis.yDataAttribute] = yMap.get(d.Year + " " +  d.Code)
-    )
-
     vis.data = vis.data.filter(
         d => parseInt(d.Year) == vis.year
     )
 
-    const xScale = d3.scaleQuantile()
-        .domain(d3.extent(Array.from(vis.data, d => d[vis.xDataAttribute])))
-        .range(d3.schemeBlues[5]);
-
-    const yScale = d3.scaleQuantile()
-        .domain(d3.extent(Array.from(vis.data, d => d[vis.yDataAttribute])))
-        .range(d3.schemeReds[9]);
+    console.log(vis.data)
+    const scale = d3.scaleQuantile()
+        .domain(d3.extent(Array.from(vis.data, d => d[vis.dataAttribute])))
+        .range(vis.colorScale);
 
     // index is a mapping from each country name to its data
     const index = d3.index(vis.data, d => d.Entity);
@@ -68,11 +47,11 @@ class BivariateChoroplethMap {
 
     // color takes in a data point and calculates the
     // amount into the x and y scales to get its color
-    const color = (value) => {
-        if (!value) return "#ffffff";
-        x = value[vis.xDataAttribute]
-        y = value[vis.yDataAttribute]
-        return yScale(y);
+    const color = (name) => {
+        let value = index.get(name)
+        if (!value) console.log(name);
+        if (!value) return "#423838"
+        return scale(value[vis.dataAttribute]);
     };
 
     const svg = d3.select(vis.config.parentElement)
@@ -84,17 +63,17 @@ class BivariateChoroplethMap {
     svg.append("g")
         .attr(
             "transform",
-            `translate(200, ${vis.config.margin.top + 350})
-            scale(1.6, 1.6)`
+            `translate(0, ${vis.config.margin.top + 200})
+            scale(1.1, 1.1)`
         )
         .selectAll("path")
         .data(vis.mapData.features)
         .join("path")
-            .attr("fill", d => color(index.get(d.properties.name)))
+            .attr("fill", d => color(d.properties.name))
             .attr("d", path)
 
-    svg.append(legend)
-        .attr("transform", "translate(870,450)");
+    // svg.append(legend)
+    //     .attr("transform", "translate(870,450)");
     }
 }
 //     //reusable functions for x and y 
@@ -185,24 +164,24 @@ class BivariateChoroplethMap {
 
 
 
-// }
+// // }
 
-legend = () => {
-  const k = 24;
-  const arrow = DOM.uid();
-  return svg`<g font-family=sans-serif font-size=10>
-  <g transform="translate(-${k * n / 2},-${k * n / 2}) rotate(-45 ${k * n / 2},${k * n / 2})">
-    <marker id="${arrow.id}" markerHeight=10 markerWidth=10 refX=6 refY=3 orient=auto>
-      <path d="M0,0L9,3L0,6Z" />
-    </marker>
-    ${d3.cross(d3.range(n), d3.range(n)).map(([i, j]) => svg`<rect width=${k} height=${k} x=${i * k} y=${(n - 1 - j) * k} fill=${colors[j * n + i]}>
-      <title>Diabetes${labels[j] && ` (${labels[j]})`}
-Obesity${labels[i] && ` (${labels[i]})`}</title>
-    </rect>`)}
-    <line marker-end="${arrow}" x1=0 x2=${n * k} y1=${n * k} y2=${n * k} stroke=black stroke-width=1.5 />
-    <line marker-end="${arrow}" y2=0 y1=${n * k} stroke=black stroke-width=1.5 />
-    <text font-weight="bold" dy="0.71em" transform="rotate(90) translate(${n / 2 * k},6)" text-anchor="middle">Diabetes</text>
-    <text font-weight="bold" dy="0.71em" transform="translate(${n / 2 * k},${n * k + 6})" text-anchor="middle">Obesity</text>
-  </g>
-</g>`;
-}
+// legend = () => {
+//   const k = 24;
+//   const arrow = DOM.uid();
+//   return svg`<g font-family=sans-serif font-size=10>
+//   <g transform="translate(-${k * n / 2},-${k * n / 2}) rotate(-45 ${k * n / 2},${k * n / 2})">
+//     <marker id="${arrow.id}" markerHeight=10 markerWidth=10 refX=6 refY=3 orient=auto>
+//       <path d="M0,0L9,3L0,6Z" />
+//     </marker>
+//     ${d3.cross(d3.range(n), d3.range(n)).map(([i, j]) => svg`<rect width=${k} height=${k} x=${i * k} y=${(n - 1 - j) * k} fill=${colors[j * n + i]}>
+//       <title>Diabetes${labels[j] && ` (${labels[j]})`}
+// Obesity${labels[i] && ` (${labels[i]})`}</title>
+//     </rect>`)}
+//     <line marker-end="${arrow}" x1=0 x2=${n * k} y1=${n * k} y2=${n * k} stroke=black stroke-width=1.5 />
+//     <line marker-end="${arrow}" y2=0 y1=${n * k} stroke=black stroke-width=1.5 />
+//     <text font-weight="bold" dy="0.71em" transform="rotate(90) translate(${n / 2 * k},6)" text-anchor="middle">Diabetes</text>
+//     <text font-weight="bold" dy="0.71em" transform="translate(${n / 2 * k},${n * k + 6})" text-anchor="middle">Obesity</text>
+//   </g>
+// </g>`;
+// }
