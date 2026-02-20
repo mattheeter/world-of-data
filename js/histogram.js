@@ -5,8 +5,7 @@ class Histogram {
       parentElement: _config.parentElement,
       containerWidth: _config.containerWidth || 1200,
       containerHeight: _config.containerHeight || 500,
-      color: _config.color || "steelblue",
-      nBins: _config.nBins || 20,
+      colorScale: _config.colorScale,
       year: _config.year || 2020,
       dataAttribute: _config.dataAttribute,
       label: _config.label,
@@ -24,11 +23,10 @@ class Histogram {
                     //so it is good to create a variable that is a reference to 'this' class instance
 
     // Use constructor argument for nBins so that we can easily update it
-    vis.nBins = this.config.nBins;
+    vis.colorScale = vis.config.colorScale;
+    vis.nBins = vis.colorScale.length;
     vis.dataAttribute = this.config.dataAttribute;
     vis.year = this.config.year;
-    vis.title = this.config.chartTitle;
-    vis.color = this.config.color;
     vis.label = this.config.label;
 
     //set up the width and height of the area where visualizations will go- factoring in margins               
@@ -53,9 +51,17 @@ class Histogram {
         d => parseInt(d.Year) == vis.year
     )
 
+    const [min, max] = d3.extent(Array.from(vis.data, d => Number(d[vis.dataAttribute])));
+    const step = (max - min) / vis.nBins;
+
+    const thresholds = d3.range(min + step, max, step);
+    console.log(min, max)
+    console.log(step)
+    console.log(min + step, max, step)
+
     // Create bins for the data
     let bins = d3.bin()
-      .thresholds(vis.nBins)
+      .thresholds(thresholds)
       .value((d) => Number(d[vis.dataAttribute]))
     (this.data);
 
@@ -68,12 +74,13 @@ class Histogram {
         .domain([0, d3.max(bins, (d) => d.length)])
         .range([vis.height - vis.config.margin.bottom, vis.config.margin.top]);
   
+    // console.log(bins)
     // Add the histogram as a group to the svg
     vis.svg.append("g")
-        .attr("fill", vis.color)
         .selectAll()
         .data(bins)
         .join("rect")
+            .attr("fill", (d, i) => vis.colorScale[i])
             .attr("x", (d) => x(d.x0) + 1)
             .attr("width", (d) => x(d.x1) - x(d.x0) - 1)
             .attr("y", (d) => y(d.length))

@@ -3,7 +3,6 @@ let yDataSelection = "Life Expectancy, age 0"
 let data, xData, yData, topoData;
 let xHistogram, yHistogram, scatterPlot, xChoropleth, yChoropleth;
 
-
 // Mapping of data attribute names to indices in the array of loaded data
 let dataMap = new Map();
 dataMap.set(xDataSelection, 0);
@@ -16,6 +15,10 @@ labelMap.set(xDataSelection, "Daily Per-Capita Supply of Calories");
 labelMap.set(yDataSelection, "Life Expectancy from Birth");
 labelMap.set("Share of the population who cannot afford a healthy diet", "% Population Cannot Afford Healthy Diet");
 labelMap.set("Health expenditure per capita, PPP", "Per-Captia Health Expenditure");
+
+
+let xColorScale = d3.schemeBlues[7];
+let yColorScale = d3.schemeReds[7];
 
 
 Promise.all([
@@ -36,19 +39,18 @@ Promise.all([
         "chartTitle": "Daily Supply of Calories",
         "dataAttribute": xDataSelection,
         "label": labelMap.get(xDataSelection),
+        "colorScale": xColorScale,
 	}, xData);
-
 
 	yHistogram = new Histogram({
 		"parentElement": "#life-expectancy-distribution",
         "containerHeight": 300,
-        "color": "#ca4227",
         "chartTitle": "Life Expectancy at age 0",
         "dataAttribute": yDataSelection,
         "label": labelMap.get(yDataSelection),
+        "colorScale": yColorScale,
 	}, yData);
 
-  	// Create an instance (for example in main.js)
 	scatterPlot = new ScatterPlot({
 		"parentElement": "#calories-life-expectancy-correlation",
         "containerHeight": 300,
@@ -66,7 +68,7 @@ Promise.all([
         "containerWidth": 1200,
         "containerHeight": 800,
         "label": "Daily Supply of Calories",
-        colorScale: d3.schemeBlues[7],
+        "colorScale": xColorScale,
         "dataAttribute": xDataSelection,
         "label": labelMap.get(xDataSelection),
 	}, xData, topoData);
@@ -75,7 +77,7 @@ Promise.all([
 		"parentElement": "#life-map",
         "containerWidth": 1200,
         "containerHeight": 800,
-        colorScale: d3.schemeReds[7],
+        "colorScale": yColorScale,
         "label": "Life Expectancy from 0",
         "dataAttribute": yDataSelection,
         "label": labelMap.get(yDataSelection),

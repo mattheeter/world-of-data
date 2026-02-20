@@ -83,7 +83,7 @@ class ScatterPlot {
         .call((g) => g.append("text")
             .attr("x", vis.width / 2)
             .attr("y", vis.config.margin.bottom - 2)
-            .attr("fill", "currentColor")
+            .attr("fill", "black")
             .attr("text-anchor", "end")
             .text(vis.xLabel));
 
@@ -94,7 +94,7 @@ class ScatterPlot {
         .call((g) => g.append("text")
             .attr("x", vis.config.margin.left + 60)
             .attr("y", 8)
-            .attr("fill", "currentColor")
+            .attr("fill", "black")
             .attr("text-anchor", "end")
             .text(vis.yLabel));
   
