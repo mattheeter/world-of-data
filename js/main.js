@@ -17,8 +17,9 @@ labelMap.set("Share of the population who cannot afford a healthy diet", "% Popu
 labelMap.set("Health expenditure per capita, PPP", "Per-Captia Health Expenditure");
 
 
-let xColorScale = d3.schemeBlues[7];
-let yColorScale = d3.schemeReds[7];
+let nBins = 9
+let xColorScale = d3.schemeBlues[nBins];
+let yColorScale = d3.schemeReds[nBins];
 
 
 Promise.all([

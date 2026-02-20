@@ -10,6 +10,7 @@ class Histogram {
       dataAttribute: _config.dataAttribute,
       label: _config.label,
       margin: { top: 10, bottom: 30, right: 50, left: 50 },
+      tooltipPadding: _config.tooltipPadding || 15,
     }
 
     this.data = _data;
@@ -23,11 +24,12 @@ class Histogram {
                     //so it is good to create a variable that is a reference to 'this' class instance
 
     // Use constructor argument for nBins so that we can easily update it
-    vis.colorScale = vis.config.colorScale;
-    vis.nBins = vis.colorScale.length;
+    vis.colorScale = this.config.colorScale;
+    vis.nBins = this.colorScale.length;
     vis.dataAttribute = this.config.dataAttribute;
     vis.year = this.config.year;
     vis.label = this.config.label;
+    vis.tooltipPadding = this.config.tooltipPadding;
 
     //set up the width and height of the area where visualizations will go- factoring in margins               
     vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
@@ -76,11 +78,11 @@ class Histogram {
   
     // console.log(bins)
     // Add the histogram as a group to the svg
-    vis.svg.append("g")
+    vis.bars = vis.svg.append("g")
         .selectAll()
         .data(bins)
         .join("rect")
-            .attr("fill", (d, i) => vis.colorScale[i])
+            .attr("fill", (_, i) => vis.colorScale[i])
             .attr("x", (d) => x(d.x0) + 1)
             .attr("width", (d) => x(d.x1) - x(d.x0) - 1)
             .attr("y", (d) => y(d.length))
@@ -107,5 +109,26 @@ class Histogram {
             .attr("fill", "currentColor")
             .attr("text-anchor", "end")
             .text("Number of Countries"));
+    
+    vis.bars.on("mouseover", (event, d) => {
+        d3.select('#tooltip')
+            .style('display', 'block')
+            .style('left', (event.pageX + vis.tooltipPadding) + 'px')   
+            .style('top', (event.pageY + vis.tooltipPadding) + 'px')
+            .data(vis.data)
+            .html(`
+             <div class="tooltip-title">
+               ${vis.label}: ${d3.extent(Array.from(d, d => d[vis.dataAttribute])).join(" - ")} 
+             </div>
+              <ul>
+              <li>Number of countries: ${Array.from(d, d => d[vis.dataAttribute]).length}</li>
+              <li>Included countries: ${Array.from(d, d => d.Entity).join(", ")}</li>
+              </ul>
+            `);
+    });
+
+    vis.bars.on('mouseleave', () => {
+          d3.select('#tooltip').style('display', 'none');
+    });
   }
 }

@@ -10,6 +10,7 @@ class BivariateChoroplethMap {
       dataAttribute: _config.dataAttribute,
       label: _config.label,
       margin: { top: 10, bottom: 30, right: 50, left: 50 },
+      tooltipPadding: _config.tooltipPadding || 15,
     }
 
     this.data = _data;
@@ -26,6 +27,7 @@ class BivariateChoroplethMap {
     vis.dataAttribute = this.config.dataAttribute
     vis.colorScale = this.config.colorScale;
     vis.label = this.config.label;
+    vis.tooltipPadding = this.config.tooltipPadding;
 
     //set up the width and height of the area where visualizations will go- factoring in margins               
     vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
@@ -67,7 +69,7 @@ class BivariateChoroplethMap {
         return scale(Number(value[vis.dataAttribute]));
     };
 
-    vis.svg.append("g")
+    vis.map = vis.svg.append("g")
         .attr(
             "transform",
             `translate(0, ${vis.config.margin.top + 150})
@@ -76,7 +78,7 @@ class BivariateChoroplethMap {
         .selectAll("path")
         .data(vis.mapData.features)
         .join("path")
-            .attr("stroke", "white")
+            .attr("stroke", "black")
             .attr("stroke-width", "0.5")
             .attr("fill", d => color(d.properties.name))
             .attr("d", path)
@@ -115,5 +117,24 @@ class BivariateChoroplethMap {
             .attr("fill", "currentColor")
             .attr("text-anchor", "end")
             .text(vis.label));
+    
+    vis.map.on("mouseover", (event, d) => {
+        d = index.get(d.properties.name)
+        d3.select('#tooltip')
+            .style('display', 'block')
+            .style('left', (event.pageX + vis.tooltipPadding) + 'px')   
+            .style('top', (event.pageY + vis.tooltipPadding) + 'px')
+            .data(vis.data)
+            .html(`
+             <div class=tooltip-title>${d.Entity}</div>
+              <ul>
+              <li>${vis.label}: ${d[vis.dataAttribute]}</li>
+              </ul>
+            `);
+    });
+
+    vis.map.on('mouseleave', () => {
+          d3.select('#tooltip').style('display', 'none');
+    });
   }
 }

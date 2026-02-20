@@ -12,6 +12,7 @@ class ScatterPlot {
       xLabel: _config.xLabel,
       yLabel: _config.yLabel,
       margin: { top: 10, bottom: 30, right: 50, left: 50 },
+      tooltipPadding: _config.tooltipPadding || 15,
     }
 
     this.xData = _xData;
@@ -31,6 +32,7 @@ class ScatterPlot {
     vis.yLabel = this.config.yLabel;
     vis.year = this.config.year;
     vis.title = this.config.chartTitle;
+    vis.tooltipPadding = this.config.tooltipPadding;
 
     //set up the width and height of the area where visualizations will go- factoring in margins               
     vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
@@ -98,14 +100,33 @@ class ScatterPlot {
             .attr("text-anchor", "end")
             .text(vis.yLabel));
   
-    vis.svg.append("g")
+    vis.points = vis.svg.append("g")
         .attr("transform", `translate(0, ${vis.config.margin.top})`)
-        .selectAll("circle")
+        .selectAll()
         .data(vis.data)
         .join("circle")
             .attr("fill", "steelblue")
             .attr("cx", d => x(Number(d[vis.xDataAttribute])))
             .attr("cy", d => y(Number(d[vis.yDataAttribute])))
             .attr("r", 5);
+
+    vis.points.on("mouseover", (event, d) => {
+        d3.select('#tooltip')
+            .style('display', 'block')
+            .style('left', (event.pageX + vis.tooltipPadding) + 'px')   
+            .style('top', (event.pageY + vis.tooltipPadding) + 'px')
+            .data(vis.data)
+            .html(`
+             <div class=tooltip-title>${d.Entity}</div>
+              <ul>
+              <li>${vis.xLabel}: ${d[vis.xDataAttribute]}</li>
+              <li>${vis.yLabel}: ${d[vis.yDataAttribute]}</li>
+              </ul>
+            `);
+    });
+
+    vis.points.on('mouseleave', () => {
+          d3.select('#tooltip').style('display', 'none');
+    });
     }
 }
