@@ -100,8 +100,11 @@ class ScatterPlot {
             .attr("text-anchor", "end")
             .text(vis.yLabel));
   
-    vis.points = vis.svg.append("g")
-        .attr("transform", `translate(0, ${vis.config.margin.top})`)
+    // Define separate layers so brushing doesn't block hover events
+    vis.pointsLayer = vis.svg.append("g");
+    vis.brushLayer = vis.svg.append("g").attr("class", "brush");
+    
+    vis.points = vis.pointsLayer
         .selectAll()
         .data(vis.data)
         .join("circle")
@@ -110,6 +113,7 @@ class ScatterPlot {
             .attr("cy", d => y(Number(d[vis.yDataAttribute])))
             .attr("r", 5);
 
+    
     vis.points.on("mouseover", (event, d) => {
         d3.select('#tooltip')
             .style('display', 'block')
@@ -128,5 +132,21 @@ class ScatterPlot {
     vis.points.on('mouseleave', () => {
           d3.select('#tooltip').style('display', 'none');
     });
+
+    vis.brush = d3.brush().on("start brush end", ({selection}) => {
+        if (selection) {
+            const [[x0, y0], [x1, y1]] = selection;
+            vis.points
+            .style("fill", "gray")
+            .filter(d => x0 <= x(d[vis.xDataAttribute]) && x(d[vis.xDataAttribute]) < x1
+                    && y0 <= y(d[vis.yDataAttribute]) && y(d[vis.yDataAttribute]) < y1)
+            .style("fill", "steelblue")
+        } else {
+            vis.points.style("fill", "steelblue");
+        }
+    });
+
+    vis.brushLayer.call(vis.brush);
+    vis.pointsLayer.raise();
     }
 }
