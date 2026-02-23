@@ -84,6 +84,7 @@ Promise.all([
 	}, yData, topoData);
 
     xHistogram.dependentVis = [yHistogram, scatterPlot];
+    yHistogram.dependentVis = [xHistogram, scatterPlot];
     scatterPlot.dependentVis = [xHistogram, yHistogram];
 })
 .catch(error => {

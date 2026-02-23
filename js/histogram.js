@@ -145,6 +145,7 @@ class Histogram {
     vis.brush = d3.brushX().on("start brush end", ({selection}) => {
         if (selection) {
             const [x0, x1] = selection;
+
             let selected_data = vis.bars
             .style("opacity", "0.3")
             .filter(d => {
@@ -161,6 +162,8 @@ class Histogram {
             })
             .style("opacity", "1.0")
             .data()
+            // This is an array of arrays, so we have to flatten it
+            .flat();
 
             for (let i in vis.dependentVis) {
                 vis.dependentVis[i].countries = Array.from(selected_data, d => d.Entity);
@@ -168,7 +171,7 @@ class Histogram {
             }
 
         } else {
-            vis.points.style("opacity", "1.0");
+            vis.bars.style("opacity", "1.0");
         }
     });
 
