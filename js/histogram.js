@@ -84,9 +84,11 @@ class Histogram {
         .domain([0, d3.max(bins, (d) => d.length)])
         .range([vis.height - vis.config.margin.bottom, vis.config.margin.top]);
   
-    // console.log(bins)
+    vis.barsLayer = vis.svg.append("g");
+    vis.brushLayer = vis.svg.append("g").attr("class", "brush");
+
     // Add the histogram as a group to the svg
-    vis.bars = vis.svg.append("g")
+    vis.bars = vis.barsLayer
         .selectAll()
         .data(bins)
         .join("rect")
@@ -139,5 +141,38 @@ class Histogram {
     vis.bars.on('mouseleave', () => {
           d3.select('#tooltip').style('display', 'none');
     });
+
+    vis.brush = d3.brushX().on("start brush end", ({selection}) => {
+        if (selection) {
+            const [x0, x1] = selection;
+            let selected_data = vis.bars
+            .style("opacity", "0.3")
+            .filter(d => {
+                // If any point on a bar is encompassed by the brush, we include it. 
+                let min = x(Math.min(...Array.from(d, d => Number(d[vis.dataAttribute]))))
+                let max = x(Math.max(...Array.from(d, d => Number(d[vis.dataAttribute]))))
+                return (
+                    // The brush is within a bar
+                    (x0 >= min && x1 <= max) ||
+                    // The brush is partially in one and its neighbor
+                    (x0 <= max && x1 >= max) ||
+                    (x0 <= min && x1 >= min)
+                )
+            })
+            .style("opacity", "1.0")
+            .data()
+
+            for (let i in vis.dependentVis) {
+                vis.dependentVis[i].countries = Array.from(selected_data, d => d.Entity);
+                vis.dependentVis[i].updateVis()
+            }
+
+        } else {
+            vis.points.style("opacity", "1.0");
+        }
+    });
+
+    vis.brushLayer.call(vis.brush);
+    vis.barsLayer.raise();
   }
 }

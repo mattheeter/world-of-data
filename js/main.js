@@ -21,17 +21,6 @@ let nBins = 9
 let xColorScale = d3.schemeBlues[nBins];
 let yColorScale = d3.schemeReds[nBins];
 
-let includedCountries = [
-    "United States",
-    "Canada",
-    // "Mexico",
-    // "Chad",
-    // "Brazil",
-    // "Venezuela",
-    // "Bolivia"
-];
-
-
 Promise.all([
     d3.csv("data/food/daily_calories_per_capita/data.csv"),
     d3.csv("data/health/life_expectancy/data.csv"),
@@ -50,7 +39,6 @@ Promise.all([
         "chartTitle": "Daily Supply of Calories",
         "dataAttribute": xDataSelection,
         "label": labelMap.get(xDataSelection),
-        // "countries": includedCountries,
         "colorScale": xColorScale,
 	}, xData);
 
@@ -72,7 +60,6 @@ Promise.all([
         "yDataAttribute": yDataSelection,
         "xLabel": labelMap.get(xDataSelection),
         "yLabel": labelMap.get(yDataSelection),
-        // "countries": includedCountries,
 	}, xData, yData);
 
   	// Create an instance (for example in main.js)
@@ -96,6 +83,7 @@ Promise.all([
         "label": labelMap.get(yDataSelection),
 	}, yData, topoData);
 
+    xHistogram.dependentVis = [yHistogram, scatterPlot];
     scatterPlot.dependentVis = [xHistogram, yHistogram];
 })
 .catch(error => {

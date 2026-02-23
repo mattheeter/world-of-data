@@ -142,7 +142,6 @@ class ScatterPlot {
             const [[x0, y0], [x1, y1]] = selection;
             let selected_data = vis.points
             .style("fill", "gray")
-            .call(console.log)
             .filter(d => x0 <= x(d[vis.xDataAttribute]) && x(d[vis.xDataAttribute]) < x1
                     && y0 <= y(d[vis.yDataAttribute]) && y(d[vis.yDataAttribute]) < y1)
             .style("fill", "steelblue")
