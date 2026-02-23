@@ -9,6 +9,7 @@ class Histogram {
       year: _config.year || 2020,
       dataAttribute: _config.dataAttribute,
       label: _config.label,
+      countries: _config.countries || [],
       margin: { top: 10, bottom: 30, right: 50, left: 50 },
       tooltipPadding: _config.tooltipPadding || 15,
     }
@@ -29,6 +30,7 @@ class Histogram {
     vis.dataAttribute = this.config.dataAttribute;
     vis.year = this.config.year;
     vis.label = this.config.label;
+    vis.countries = this.config.countries;
     vis.tooltipPadding = this.config.tooltipPadding;
 
     //set up the width and height of the area where visualizations will go- factoring in margins               
@@ -47,25 +49,31 @@ class Histogram {
   updateVis() {
     let vis = this;
 
+    // Clear any previous stuff from updating
     vis.svg.selectAll("*").remove();
 
-    vis.data = vis.data.filter(
+    // Filter by the provided year
+    vis.displayedData = vis.data.filter(
         d => parseInt(d.Year) == vis.year
     )
 
-    const [min, max] = d3.extent(Array.from(vis.data, d => Number(d[vis.dataAttribute])));
+    // And the included countries
+    if (vis.countries.length > 1) {
+        vis.displayedData = vis.displayedData.filter(
+            d => vis.countries.includes(d.Entity)
+        )
+    }
+
+    const [min, max] = d3.extent(Array.from(vis.displayedData, d => Number(d[vis.dataAttribute])));
     const step = (max - min) / vis.nBins;
 
     const thresholds = d3.range(min + step, max, step);
-    console.log(min, max)
-    console.log(step)
-    console.log(min + step, max, step)
 
     // Create bins for the data
     let bins = d3.bin()
       .thresholds(thresholds)
       .value((d) => Number(d[vis.dataAttribute]))
-    (this.data);
+    (vis.displayedData);
 
     // TODO: Confirm sizing and margins
     const x = d3.scaleLinear()
@@ -82,6 +90,7 @@ class Histogram {
         .selectAll()
         .data(bins)
         .join("rect")
+            .attr("stroke", "black")
             .attr("fill", (_, i) => vis.colorScale[i])
             .attr("x", (d) => x(d.x0) + 1)
             .attr("width", (d) => x(d.x1) - x(d.x0) - 1)
@@ -115,7 +124,7 @@ class Histogram {
             .style('display', 'block')
             .style('left', (event.pageX + vis.tooltipPadding) + 'px')   
             .style('top', (event.pageY + vis.tooltipPadding) + 'px')
-            .data(vis.data)
+            .data(vis.displayedData)
             .html(`
              <div class="tooltip-title">
                ${vis.label}: ${d3.extent(Array.from(d, d => d[vis.dataAttribute])).join(" - ")} 

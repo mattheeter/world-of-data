@@ -7,10 +7,12 @@ class ScatterPlot {
       containerWidth: _config.containerWidth || 1200,
       containerHeight: _config.containerHeight || 500,
       year: _config.year || 2020,
+      dependentVis: _config.dependentVis,
       xDataAttribute: _config.xDataAttribute,
       yDataAttribute: _config.yDataAttribute,
       xLabel: _config.xLabel,
       yLabel: _config.yLabel,
+      countries: _config.countries,
       margin: { top: 10, bottom: 30, right: 50, left: 50 },
       tooltipPadding: _config.tooltipPadding || 15,
     }
@@ -32,7 +34,9 @@ class ScatterPlot {
     vis.yLabel = this.config.yLabel;
     vis.year = this.config.year;
     vis.title = this.config.chartTitle;
+    vis.countries = this.config.countries;
     vis.tooltipPadding = this.config.tooltipPadding;
+    vis.dependentVis = this.config.dependentVis;
 
     //set up the width and height of the area where visualizations will go- factoring in margins               
     vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
@@ -136,11 +140,19 @@ class ScatterPlot {
     vis.brush = d3.brush().on("start brush end", ({selection}) => {
         if (selection) {
             const [[x0, y0], [x1, y1]] = selection;
-            vis.points
+            let selected_data = vis.points
             .style("fill", "gray")
+            .call(console.log)
             .filter(d => x0 <= x(d[vis.xDataAttribute]) && x(d[vis.xDataAttribute]) < x1
                     && y0 <= y(d[vis.yDataAttribute]) && y(d[vis.yDataAttribute]) < y1)
             .style("fill", "steelblue")
+            .data()
+
+            for (let i in vis.dependentVis) {
+                vis.dependentVis[i].countries = Array.from(selected_data, d => d.Entity);
+                vis.dependentVis[i].updateVis()
+            }
+
         } else {
             vis.points.style("fill", "steelblue");
         }
