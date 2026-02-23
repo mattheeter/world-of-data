@@ -12,7 +12,7 @@ class ScatterPlot {
       yDataAttribute: _config.yDataAttribute,
       xLabel: _config.xLabel,
       yLabel: _config.yLabel,
-      countries: _config.countries,
+      countries: _config.countries || [],
       margin: { top: 10, bottom: 30, right: 50, left: 50 },
       tooltipPadding: _config.tooltipPadding || 15,
     }
@@ -65,21 +65,27 @@ class ScatterPlot {
     )
 
     // For each xData point, set the yData attribute
-    vis.data = structuredClone(vis.xData)
-    vis.data.forEach(
-        (d, i) => vis.data[i][vis.yDataAttribute] = yMap.get(d.Year + " " +  d.Code)
+    vis.displayedData = structuredClone(vis.xData)
+    vis.displayedData.forEach(
+        (d, i) => vis.displayedData[i][vis.yDataAttribute] = yMap.get(d.Year + " " +  d.Code)
     )
 
-    vis.data = vis.data.filter(
+    vis.displayedData = vis.displayedData.filter(
         d => parseInt(d.Year) == vis.year
     )
 
+    // if (vis.countries.length > 1) {
+    //     vis.displayedData = vis.displayedData.filter(
+    //         d => vis.countries.includes(d.Entity)
+    //     )
+    // }
+
     const x = d3.scaleLinear()
-        .domain(d3.extent(vis.data, d => Number(d[vis.xDataAttribute]))).nice()
+        .domain(d3.extent(vis.displayedData, d => Number(d[vis.xDataAttribute]))).nice()
         .range([vis.config.margin.right, vis.width - vis.config.margin.left]);
 
     const y = d3.scaleLinear()
-        .domain(d3.extent(vis.data, d => Number(d[vis.yDataAttribute]))).nice()
+        .domain(d3.extent(vis.displayedData, d => Number(d[vis.yDataAttribute]))).nice()
         .range([vis.height - vis.config.margin.bottom, vis.config.margin.top]);
 
     // Add the x-axis as a group to the svg
@@ -110,9 +116,26 @@ class ScatterPlot {
     
     vis.points = vis.pointsLayer
         .selectAll()
-        .data(vis.data)
+        .data(vis.displayedData)
         .join("circle")
-            .attr("fill", "steelblue")
+            .attr("fill", d => {
+                if (!(vis.countries.length)) {
+                    return "steelblue"
+                }
+                if (vis.countries.includes(d.Entity)) {
+                    return "steelblue"
+                }
+                return "white"
+            })
+            .attr("stroke", d => {
+                if (!(vis.countries.length)) {
+                    return "steelblue"
+                }
+                if (vis.countries.includes(d.Entity)) {
+                    return "steelblue"
+                }
+                return "gray"
+            })
             .attr("cx", d => x(Number(d[vis.xDataAttribute])))
             .attr("cy", d => y(Number(d[vis.yDataAttribute])))
             .attr("r", 5);
@@ -123,7 +146,7 @@ class ScatterPlot {
             .style('display', 'block')
             .style('left', (event.pageX + vis.tooltipPadding) + 'px')   
             .style('top', (event.pageY + vis.tooltipPadding) + 'px')
-            .data(vis.data)
+            .data(vis.displayedData)
             .html(`
              <div class=tooltip-title>${d.Entity}</div>
               <ul>
@@ -141,10 +164,12 @@ class ScatterPlot {
         if (selection) {
             const [[x0, y0], [x1, y1]] = selection;
             let selected_data = vis.points
-            .style("fill", "gray")
+            .style("fill", "white")
+            .style("stroke", "gray")
             .filter(d => x0 <= x(d[vis.xDataAttribute]) && x(d[vis.xDataAttribute]) < x1
                     && y0 <= y(d[vis.yDataAttribute]) && y(d[vis.yDataAttribute]) < y1)
             .style("fill", "steelblue")
+            .style("stroke", "steelblue")
             .data()
 
             for (let i in vis.dependentVis) {
