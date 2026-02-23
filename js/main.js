@@ -83,9 +83,9 @@ Promise.all([
         "label": labelMap.get(yDataSelection),
 	}, yData, topoData);
 
-    xHistogram.dependentVis = [yHistogram, scatterPlot];
-    yHistogram.dependentVis = [xHistogram, scatterPlot];
-    scatterPlot.dependentVis = [xHistogram, yHistogram];
+    xHistogram.dependentVis = [yHistogram, scatterPlot, xChoropleth, yChoropleth];
+    yHistogram.dependentVis = [xHistogram, scatterPlot, xChoropleth, yChoropleth];
+    scatterPlot.dependentVis = [xHistogram, yHistogram, xChoropleth, yChoropleth];
 })
 .catch(error => {
     console.error('Error:');

@@ -74,12 +74,6 @@ class ScatterPlot {
         d => parseInt(d.Year) == vis.year
     )
 
-    // if (vis.countries.length > 1) {
-    //     vis.displayedData = vis.displayedData.filter(
-    //         d => vis.countries.includes(d.Entity)
-    //     )
-    // }
-
     const x = d3.scaleLinear()
         .domain(d3.extent(vis.displayedData, d => Number(d[vis.xDataAttribute]))).nice()
         .range([vis.config.margin.right, vis.width - vis.config.margin.left]);

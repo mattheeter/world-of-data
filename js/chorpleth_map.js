@@ -9,6 +9,7 @@ class BivariateChoroplethMap {
       year: _config.year || 2020,
       dataAttribute: _config.dataAttribute,
       label: _config.label,
+      countries: _config.countries || [],
       margin: { top: 10, bottom: 30, right: 50, left: 50 },
       tooltipPadding: _config.tooltipPadding || 15,
     }
@@ -27,6 +28,7 @@ class BivariateChoroplethMap {
     vis.dataAttribute = this.config.dataAttribute
     vis.colorScale = this.config.colorScale;
     vis.label = this.config.label;
+    vis.countries = this.config.countries;
     vis.tooltipPadding = this.config.tooltipPadding;
 
     //set up the width and height of the area where visualizations will go- factoring in margins               
@@ -69,7 +71,10 @@ class BivariateChoroplethMap {
         return scale(Number(value[vis.dataAttribute]));
     };
 
-    vis.map = vis.svg.append("g")
+    vis.brushLayer = vis.svg.append("g").attr("class", "brush");
+    vis.mapLayer = vis.svg.append("g");
+
+    vis.map = vis.mapLayer
         .attr(
             "transform",
             `translate(0, ${vis.config.margin.top + 150})
@@ -78,10 +83,20 @@ class BivariateChoroplethMap {
         .selectAll("path")
         .data(vis.mapData.features)
         .join("path")
+            .attr("fill", "white")
             .attr("stroke", "black")
             .attr("stroke-width", "0.5")
-            .attr("fill", d => color(d.properties.name))
             .attr("d", path)
+            .attr("fill", d => color(d.properties.name))
+            .attr("opacity", d => {
+                if (!(vis.countries.length)) {
+                    return "1.0"
+                }
+                if (vis.countries.includes(d.properties.name)) {
+                    return "1.0"
+                }
+                return "0.3"
+            });
 
     // Build the legend
     const boxScale = d3.scaleLinear()
@@ -136,5 +151,8 @@ class BivariateChoroplethMap {
     vis.map.on('mouseleave', () => {
           d3.select('#tooltip').style('display', 'none');
     });
+
+    // vis.brushLayer.call(vis.brush);
+    vis.mapLayer.raise();
   }
 }
