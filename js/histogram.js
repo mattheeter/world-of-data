@@ -147,7 +147,7 @@ class Histogram {
             const [x0, x1] = selection;
 
             let selected_data = vis.bars
-            .style("opacity", "0.3")
+            .style("opacity", "0.1")
             .filter(d => {
                 // If any point on a bar is encompassed by the brush, we include it. 
                 let min = x(Math.min(...Array.from(d, d => Number(d[vis.dataAttribute]))))

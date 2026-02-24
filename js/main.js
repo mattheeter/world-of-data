@@ -86,6 +86,8 @@ Promise.all([
     xHistogram.dependentVis = [yHistogram, scatterPlot, xChoropleth, yChoropleth];
     yHistogram.dependentVis = [xHistogram, scatterPlot, xChoropleth, yChoropleth];
     scatterPlot.dependentVis = [xHistogram, yHistogram, xChoropleth, yChoropleth];
+    xChoropleth.dependentVis = [xHistogram, yHistogram, scatterPlot, yChoropleth];
+    yChoropleth.dependentVis = [xHistogram, yHistogram, scatterPlot, xChoropleth];
 })
 .catch(error => {
     console.error('Error:');

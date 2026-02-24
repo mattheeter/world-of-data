@@ -95,7 +95,7 @@ class BivariateChoroplethMap {
                 if (vis.countries.includes(d.properties.name)) {
                     return "1.0"
                 }
-                return "0.3"
+                return "0.1"
             });
 
     // Build the legend
@@ -152,7 +152,45 @@ class BivariateChoroplethMap {
           d3.select('#tooltip').style('display', 'none');
     });
 
-    // vis.brushLayer.call(vis.brush);
+    vis.brush = d3.brush().on("start brush end", ({selection}) => {
+        if (selection) {
+            let [[x0, y0], [x1, y1]] = selection;
+            x0 -= vis.config.margin.left; 
+            x1 -= vis.config.margin.left;
+            y0 -= vis.config.margin.top + 150; 
+            y1 -= vis.config.margin.top + 150;
+
+            let selected_data = vis.map
+            .style("opacity", "0.1")
+            .filter(d => {
+                // If any point on a bar is encompassed by the brush, we include it. 
+                let [[minX, minY], [maxX, maxY]] = path.bounds(d);
+                console.log(minY, maxY)
+
+                return (
+                    minX < x1 &&
+                    maxX > x0 &&
+                    minY < y1 &&
+                    maxY > y0
+                )
+            })
+            .style("opacity", "1.0")
+            .data()
+            // This is an array of arrays, so we have to flatten it
+
+            for (let i in vis.dependentVis) {
+                vis.dependentVis[i].countries = Array.from(selected_data, d => d.properties.name);
+                vis.dependentVis[i].updateVis()
+            }
+
+        } else {
+            vis.map.style("opacity", "1.0");
+        }
+    });
+
+    vis.brushLayer.call(vis.brush);
+
+    vis.brushLayer.call(vis.brush);
     vis.mapLayer.raise();
   }
 }
