@@ -100,7 +100,7 @@ class BivariateChoroplethMap {
 
     // Build the legend
     const boxScale = d3.scaleLinear()
-        .domain(d3.extent(scale.quantiles()))
+        .domain(d3.extent(scale.domain()))
         .range([vis.config.margin.left, vis.width - vis.config.margin.right]);
 
     vis.svg.append("g")
