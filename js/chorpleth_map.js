@@ -49,16 +49,16 @@ class BivariateChoroplethMap {
 
     vis.svg.selectAll("*").remove();
 
-    vis.data = vis.data.filter(
+    vis.displayedData = vis.data.filter(
         d => parseInt(d.Year) == vis.year
     )
 
     const scale = d3.scaleQuantile()
-        .domain(d3.extent(Array.from(vis.data, d => Number(d[vis.dataAttribute]))))
+        .domain(d3.extent(Array.from(vis.displayedData, d => Number(d[vis.dataAttribute]))))
         .range(vis.colorScale);
 
     // index is a mapping from each country name to its data
-    const index = d3.index(vis.data, d => d.Entity);
+    const index = d3.index(vis.displayedData, d => d.Entity);
 
     const projection = d3.geoMercator();
     const path = d3.geoPath(projection)
@@ -139,7 +139,7 @@ class BivariateChoroplethMap {
             .style('display', 'block')
             .style('left', (event.pageX + vis.tooltipPadding) + 'px')   
             .style('top', (event.pageY + vis.tooltipPadding) + 'px')
-            .data(vis.data)
+            .data(vis.displayedData)
             .html(`
              <div class=tooltip-title>${d.Entity}</div>
               <ul>

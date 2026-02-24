@@ -143,3 +143,42 @@ d3.select("#y-button").on("click", function() {
     yChoropleth.label = newLabel;
     yChoropleth.updateVis();
 });
+
+
+d3.select("#year-slider").on("input", function() {
+    let year = this.value;
+
+    xHistogram.year = year;
+    xHistogram.updateVis();
+
+    yHistogram.year = year;
+    yHistogram.updateVis();
+
+    scatterPlot.year = year;
+    scatterPlot.updateVis();
+
+    xChoropleth.year = year;
+    xChoropleth.updateVis();
+
+    yChoropleth.year = year;
+    yChoropleth.updateVis();
+});
+
+
+d3.select("#bin-slider").on("input", function() {
+    nBins = this.value
+    xColorScale = d3.schemeBlues[nBins];
+    yColorScale = d3.schemeReds[nBins];
+
+    xHistogram.colorScale = xColorScale;
+    xHistogram.updateVis();
+
+    yHistogram.colorScale = yColorScale;
+    yHistogram.updateVis();
+
+    xChoropleth.colorScale = xColorScale
+    xChoropleth.updateVis();
+
+    yChoropleth.colorScale = yColorScale
+    yChoropleth.updateVis();
+});

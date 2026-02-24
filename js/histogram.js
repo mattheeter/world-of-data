@@ -26,7 +26,6 @@ class Histogram {
 
     // Use constructor argument for nBins so that we can easily update it
     vis.colorScale = this.config.colorScale;
-    vis.nBins = this.colorScale.length;
     vis.dataAttribute = this.config.dataAttribute;
     vis.year = this.config.year;
     vis.label = this.config.label;
@@ -64,6 +63,7 @@ class Histogram {
         )
     }
 
+    vis.nBins = this.colorScale.length;
     const [min, max] = d3.extent(Array.from(vis.displayedData, d => Number(d[vis.dataAttribute])));
     const step = (max - min) / vis.nBins;
 
