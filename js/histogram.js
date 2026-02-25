@@ -10,6 +10,7 @@ class Histogram {
       dataAttribute: _config.dataAttribute,
       label: _config.label,
       countries: _config.countries || [],
+      brushingDisabled: _config.brushingDisabled || false,
       margin: { top: 10, bottom: 40, right: 50, left: 50 },
       tooltipPadding: _config.tooltipPadding || 15,
     }
@@ -21,16 +22,15 @@ class Histogram {
   }
 
   initVis() {
-    let vis = this; //this is a keyword that can go out of scope, especially in callback functions, 
-                    //so it is good to create a variable that is a reference to 'this' class instance
+    let vis = this;
 
-    // Use constructor argument for nBins so that we can easily update it
     vis.colorScale = this.config.colorScale;
     vis.dataAttribute = this.config.dataAttribute;
     vis.year = this.config.year;
     vis.label = this.config.label;
     vis.countries = this.config.countries;
     vis.tooltipPadding = this.config.tooltipPadding;
+    vis.brushingDisabled = this.config.brushingDisabled;
 
     //set up the width and height of the area where visualizations will go- factoring in margins               
     vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
@@ -115,7 +115,7 @@ class Histogram {
     // Add the y-axis as a group to the svg
     vis.svg.append("g")
         .attr("transform", `translate(${vis.config.margin.left}, 0)`)
-        .call(d3.axisLeft(y).ticks(vis.width / 80).tickSizeOuter(0))
+        .call(d3.axisLeft(y).ticks(vis.width / 120).tickSizeOuter(0))
         .call((g) => g.append("text")
             .attr("x", vis.config.margin.left + 110)
             .attr("y", vis.config.margin.top + 10)
@@ -146,6 +146,11 @@ class Histogram {
     });
 
     vis.brush = d3.brushX().on("start brush end", ({selection}) => {
+        if (vis.brushingDisabled) {
+            // Antoher vis is currently brushing, don't enable this one to
+            vis.brush.move(vis.brushLayer, null);
+            return;
+        }
         if (selection) {
             const [x0, x1] = selection;
 
@@ -170,11 +175,17 @@ class Histogram {
 
             for (let i in vis.dependentVis) {
                 vis.dependentVis[i].countries = Array.from(selected_data, d => d.Entity);
+                vis.dependentVis[i].brushingDisabled = true;
                 vis.dependentVis[i].updateVis()
             }
 
         } else {
             vis.bars.style("opacity", "1.0");
+            for (let i in vis.dependentVis) {
+                vis.dependentVis[i].brushingDisabled = false;
+                vis.dependentVis[i].countries = [];
+                vis.dependentVis[i].updateVis()
+            }
         }
     });
 

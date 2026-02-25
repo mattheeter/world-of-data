@@ -13,6 +13,7 @@ class ScatterPlot {
       xLabel: _config.xLabel,
       yLabel: _config.yLabel,
       countries: _config.countries || [],
+      brushingDisabled: _config.brushingDisabled || false,
       margin: { top: 10, bottom: 30, right: 50, left: 50 },
       tooltipPadding: _config.tooltipPadding || 15,
     }
@@ -37,6 +38,7 @@ class ScatterPlot {
     vis.countries = this.config.countries;
     vis.tooltipPadding = this.config.tooltipPadding;
     vis.dependentVis = this.config.dependentVis;
+    vis.brushingDisabled = this.config.brushingDisabled;
 
     //set up the width and height of the area where visualizations will go- factoring in margins               
     vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
@@ -155,6 +157,11 @@ class ScatterPlot {
     });
 
     vis.brush = d3.brush().on("start brush end", ({selection}) => {
+        if (vis.brushingDisabled) {
+            // Antoher vis is currently brushing, don't enable this one to
+            vis.brush.move(vis.brushLayer, null);
+            return;
+        }
         if (selection) {
             const [[x0, y0], [x1, y1]] = selection;
             let selected_data = vis.points
@@ -168,30 +175,23 @@ class ScatterPlot {
 
             for (let i in vis.dependentVis) {
                 vis.dependentVis[i].countries = Array.from(selected_data, d => d.Entity);
+                vis.dependentVis[i].brushingDisabled = true;
                 vis.dependentVis[i].updateVis()
             }
 
         } else {
             vis.points.style("fill", "#b311e9");
+            for (let i in vis.dependentVis) {
+                vis.dependentVis[i].brushingDisabled = false;
+                vis.dependentVis[i].countries = [];
+                vis.dependentVis[i].updateVis()
+            }
         }
     });
-
 
     vis.points.on("mouseleave", () => {
           d3.select("#tooltip").style("display", "none");
     });
-
-    // Clear the brush selection when we leave the svg so that we can't "stack" them
-    vis.brushLayer.on("mouseleave", (event) =>{
-        if (event.relatedTarget.tagName == "circle")
-            // We only want to clear it when we leave the svg, not when we hit something on the SVG
-            return
-        vis.brush.move(vis.brushLayer, null);
-        for (let i in vis.dependentVis) {
-            vis.dependentVis[i].countries = [];
-            vis.dependentVis[i].updateVis()
-        }
-    })
 
     vis.brushLayer.call(vis.brush);
     vis.pointsLayer.raise();

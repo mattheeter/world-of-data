@@ -10,6 +10,7 @@ class BivariateChoroplethMap {
       dataAttribute: _config.dataAttribute,
       label: _config.label,
       countries: _config.countries || [],
+      brushingDisabled: _config.brushingDisabled || false,
       margin: { top: 10, bottom: 30, right: 50, left: 50 },
       tooltipPadding: _config.tooltipPadding || 15,
     }
@@ -30,6 +31,7 @@ class BivariateChoroplethMap {
     vis.label = this.config.label;
     vis.countries = this.config.countries;
     vis.tooltipPadding = this.config.tooltipPadding;
+    vis.brushingDisabled = this.config.brushingDisabled;
 
     //set up the width and height of the area where visualizations will go- factoring in margins               
     vis.width = vis.config.containerWidth - vis.config.margin.left - vis.config.margin.right;
@@ -155,6 +157,11 @@ class BivariateChoroplethMap {
     });
 
     vis.brush = d3.brush().on("start brush end", ({selection}) => {
+        if (vis.brushingDisabled) {
+            // Antoher vis is currently brushing, don't enable this one to
+            vis.brush.move(vis.brushLayer, null);
+            return;
+        }
         if (selection) {
             let [[x0, y0], [x1, y1]] = selection;
             x0 -= vis.config.margin.left; 
@@ -182,11 +189,17 @@ class BivariateChoroplethMap {
 
             for (let i in vis.dependentVis) {
                 vis.dependentVis[i].countries = Array.from(selected_data, d => d.properties.name);
+                vis.dependentVis[i].brushingDisabled = true;
                 vis.dependentVis[i].updateVis()
             }
 
         } else {
             vis.map.style("opacity", "1.0");
+            for (let i in vis.dependentVis) {
+                vis.dependentVis[i].brushingDisabled = false;
+                vis.dependentVis[i].countries = [];
+                vis.dependentVis[i].updateVis()
+            }
         }
     });
 
