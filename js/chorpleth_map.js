@@ -164,10 +164,10 @@ class BivariateChoroplethMap {
         }
         if (selection) {
             let [[x0, y0], [x1, y1]] = selection;
-            x0 -= vis.config.margin.left; 
-            x1 -= vis.config.margin.left;
-            y0 -= vis.config.margin.top + 150; 
-            y1 -= vis.config.margin.top + 150;
+            x0 -= vis.config.margin.left - 100; 
+            x1 -= vis.config.margin.left - 100;
+            y0 -= vis.config.margin.top + 200; 
+            y1 -= vis.config.margin.top + 200;
 
             let selected_data = vis.map
             .style("opacity", "0.1")
