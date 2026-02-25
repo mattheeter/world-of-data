@@ -98,11 +98,11 @@ class ScatterPlot {
     // Add the y-axis as a group to the svg
     vis.svg.append("g")
         .attr("transform", `translate(${vis.config.margin.left}, 0)`)
-        .call(d3.axisLeft(y).ticks(vis.width / 80).tickSizeOuter(0))
-        .attr("style", "font-size: 10px")
+        .call(d3.axisLeft(y).ticks(vis.width / 200).tickSizeOuter(0))
+        .attr("style", "font-size: 14px")
         .call((g) => g.append("text")
             .attr("x", vis.config.margin.left + 120)
-            .attr("y", vis.config.margin.top + 20)
+            .attr("y", vis.config.margin.top)
             .attr("style", "font-size: 14px")
             .attr("fill", "black")
             .attr("text-anchor", "end")
@@ -118,19 +118,19 @@ class ScatterPlot {
         .join("circle")
             .attr("fill", d => {
                 if (!(vis.countries.length)) {
-                    return "steelblue"
+                    return "#b311e9"
                 }
                 if (vis.countries.includes(d.Entity)) {
-                    return "steelblue"
+                    return "#b311e9"
                 }
                 return "white"
             })
             .attr("stroke", d => {
                 if (!(vis.countries.length)) {
-                    return "steelblue"
+                    return "#b311e9"
                 }
                 if (vis.countries.includes(d.Entity)) {
-                    return "steelblue"
+                    return "#b311e9"
                 }
                 return "gray"
             })
@@ -140,10 +140,10 @@ class ScatterPlot {
 
     
     vis.points.on("mouseover", (event, d) => {
-        d3.select('#tooltip')
-            .style('display', 'block')
-            .style('left', (event.pageX + vis.tooltipPadding) + "px")   
-            .style('top', (event.pageY + vis.tooltipPadding) + "px")
+        d3.select("#tooltip")
+            .style("display", "block")
+            .style("left", (event.pageX + vis.tooltipPadding) + "px")   
+            .style("top", (event.pageY + vis.tooltipPadding) + "px")
             .data(vis.displayedData)
             .html(`
              <div class=tooltip-title>${d.Entity}</div>
@@ -162,8 +162,8 @@ class ScatterPlot {
             .style("stroke", "gray")
             .filter(d => x0 <= x(d[vis.xDataAttribute]) && x(d[vis.xDataAttribute]) < x1
                     && y0 <= y(d[vis.yDataAttribute]) && y(d[vis.yDataAttribute]) < y1)
-            .style("fill", "steelblue")
-            .style("stroke", "steelblue")
+            .style("fill", "#b311e9")
+            .style("stroke", "#b311e9")
             .data()
 
             for (let i in vis.dependentVis) {
@@ -172,13 +172,26 @@ class ScatterPlot {
             }
 
         } else {
-            vis.points.style("fill", "steelblue");
+            vis.points.style("fill", "#b311e9");
         }
     });
 
-    vis.points.on('mouseleave', () => {
-          d3.select('#tooltip').style('display', 'none');
+
+    vis.points.on("mouseleave", () => {
+          d3.select("#tooltip").style("display", "none");
     });
+
+    // Clear the brush selection when we leave the svg so that we can't "stack" them
+    vis.brushLayer.on("mouseleave", (event) =>{
+        if (event.relatedTarget.tagName == "circle")
+            // We only want to clear it when we leave the svg, not when we hit something on the SVG
+            return
+        vis.brush.move(vis.brushLayer, null);
+        for (let i in vis.dependentVis) {
+            vis.dependentVis[i].countries = [];
+            vis.dependentVis[i].updateVis()
+        }
+    })
 
     vis.brushLayer.call(vis.brush);
     vis.pointsLayer.raise();
