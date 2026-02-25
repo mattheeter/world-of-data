@@ -10,7 +10,7 @@ class Histogram {
       dataAttribute: _config.dataAttribute,
       label: _config.label,
       countries: _config.countries || [],
-      margin: { top: 10, bottom: 30, right: 50, left: 50 },
+      margin: { top: 10, bottom: 40, right: 50, left: 50 },
       tooltipPadding: _config.tooltipPadding || 15,
     }
 
@@ -103,9 +103,11 @@ class Histogram {
     vis.svg.append("g")
         .attr("transform", `translate(0, ${vis.height - vis.config.margin.bottom})`)
         .call(d3.axisBottom(x).ticks(vis.width / 80).tickSizeOuter(0))
+        .attr("style", "font-size: 16px")
         .call((g) => g.append("text")
             .attr("x", vis.width / 2)
-            .attr("y", vis.config.margin.bottom - 2)
+            .attr("y", vis.config.margin.bottom - 3)
+            .attr("style", "font-size: 16px")
             .attr("fill", "currentColor")
             .attr("text-anchor", "end")
             .text(vis.label));
@@ -115,8 +117,9 @@ class Histogram {
         .attr("transform", `translate(${vis.config.margin.left}, 0)`)
         .call(d3.axisLeft(y).ticks(vis.width / 80).tickSizeOuter(0))
         .call((g) => g.append("text")
-            .attr("x", vis.config.margin.left + 50)
-            .attr("y", 10)
+            .attr("x", vis.config.margin.left + 110)
+            .attr("y", vis.config.margin.top + 10)
+            .attr("style", "font-size: 16px")
             .attr("fill", "currentColor")
             .attr("text-anchor", "end")
             .text("Number of Countries"));

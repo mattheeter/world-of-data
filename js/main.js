@@ -35,7 +35,7 @@ Promise.all([
 
 	xHistogram = new Histogram({
 		"parentElement": "#calories-available-distribution",
-        "containerHeight": 300,
+        "containerHeight": 250,
         "chartTitle": "Daily Supply of Calories",
         "dataAttribute": xDataSelection,
         "label": labelMap.get(xDataSelection),
@@ -44,7 +44,7 @@ Promise.all([
 
 	yHistogram = new Histogram({
 		"parentElement": "#life-expectancy-distribution",
-        "containerHeight": 300,
+        "containerHeight": 250,
         "chartTitle": "Life Expectancy at age 0",
         "dataAttribute": yDataSelection,
         "label": labelMap.get(yDataSelection),
@@ -53,7 +53,7 @@ Promise.all([
 
 	scatterPlot = new ScatterPlot({
 		"parentElement": "#calories-life-expectancy-correlation",
-        "containerHeight": 300,
+        "containerHeight": 250,
         "containerWidth": 2000,
         "chartTitle": "Life Expectancy at age 0",
         "xDataAttribute": xDataSelection,
@@ -66,7 +66,7 @@ Promise.all([
 	xChoropleth = new BivariateChoroplethMap({
 		"parentElement": "#calorie-map",
         "containerWidth": 1200,
-        "containerHeight": 800,
+        "containerHeight": 600,
         "label": "Daily Supply of Calories",
         "colorScale": xColorScale,
         "dataAttribute": xDataSelection,
@@ -76,7 +76,7 @@ Promise.all([
     yChoropleth = new BivariateChoroplethMap({
 		"parentElement": "#life-map",
         "containerWidth": 1200,
-        "containerHeight": 800,
+        "containerHeight": 600,
         "colorScale": yColorScale,
         "label": "Life Expectancy from 0",
         "dataAttribute": yDataSelection,

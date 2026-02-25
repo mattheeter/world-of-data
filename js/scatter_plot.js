@@ -86,9 +86,11 @@ class ScatterPlot {
     vis.svg.append("g")
         .attr("transform", `translate(0, ${vis.height - vis.config.margin.bottom})`)
         .call(d3.axisBottom(x).ticks(vis.width / 80).tickSizeOuter(0))
+        .attr("style", "font-size: 14px")
         .call((g) => g.append("text")
-            .attr("x", vis.width / 2)
-            .attr("y", vis.config.margin.bottom - 2)
+            .attr("x", vis.config.margin.left + 1000)
+            .attr("y", vis.config.margin.bottom - 40)
+            .attr("style", "font-size: 14px")
             .attr("fill", "black")
             .attr("text-anchor", "end")
             .text(vis.xLabel));
@@ -97,9 +99,11 @@ class ScatterPlot {
     vis.svg.append("g")
         .attr("transform", `translate(${vis.config.margin.left}, 0)`)
         .call(d3.axisLeft(y).ticks(vis.width / 80).tickSizeOuter(0))
+        .attr("style", "font-size: 10px")
         .call((g) => g.append("text")
-            .attr("x", vis.config.margin.left + 60)
-            .attr("y", 8)
+            .attr("x", vis.config.margin.left + 120)
+            .attr("y", vis.config.margin.top + 20)
+            .attr("style", "font-size: 14px")
             .attr("fill", "black")
             .attr("text-anchor", "end")
             .text(vis.yLabel));
@@ -138,8 +142,8 @@ class ScatterPlot {
     vis.points.on("mouseover", (event, d) => {
         d3.select('#tooltip')
             .style('display', 'block')
-            .style('left', (event.pageX + vis.tooltipPadding) + 'px')   
-            .style('top', (event.pageY + vis.tooltipPadding) + 'px')
+            .style('left', (event.pageX + vis.tooltipPadding) + "px")   
+            .style('top', (event.pageY + vis.tooltipPadding) + "px")
             .data(vis.displayedData)
             .html(`
              <div class=tooltip-title>${d.Entity}</div>
@@ -148,10 +152,6 @@ class ScatterPlot {
               <li>${vis.yLabel}: ${d[vis.yDataAttribute]}</li>
               </ul>
             `);
-    });
-
-    vis.points.on('mouseleave', () => {
-          d3.select('#tooltip').style('display', 'none');
     });
 
     vis.brush = d3.brush().on("start brush end", ({selection}) => {
@@ -174,6 +174,10 @@ class ScatterPlot {
         } else {
             vis.points.style("fill", "steelblue");
         }
+    });
+
+    vis.points.on('mouseleave', () => {
+          d3.select('#tooltip').style('display', 'none');
     });
 
     vis.brushLayer.call(vis.brush);

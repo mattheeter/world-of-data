@@ -77,8 +77,8 @@ class BivariateChoroplethMap {
     vis.map = vis.mapLayer
         .attr(
             "transform",
-            `translate(0, ${vis.config.margin.top + 150})
-            scale(1.1, 1.1)`
+            `translate(0, ${vis.config.margin.top + 220})
+            scale(.9, .9)`
         )
         .selectAll("path")
         .data(vis.mapData.features)
@@ -104,7 +104,7 @@ class BivariateChoroplethMap {
         .range([vis.config.margin.left, vis.width - vis.config.margin.right]);
 
     vis.svg.append("g")
-        .attr("transform", `translate(0, ${vis.config.margin.top + 625})`)
+        .attr("transform", `translate(0, ${vis.config.margin.top + 20})`)
         .selectAll("rect")
         .data(scale.range())
         .join("rect")
@@ -121,17 +121,19 @@ class BivariateChoroplethMap {
         .attr("height", 15)
         .attr("fill", d => d);
 
-    vis.svg.append("g")
-        .attr("transform", `translate(0, ${vis.config.margin.top + 650})`)
-        .call(d3.axisBottom(boxScale)
-            .tickValues([0, ...scale.quantiles()])
-            .tickSize(6))
-        .call((g) => g.append("text")
+    vis.scale = vis.svg.append("g")
+        .attr("transform", `translate(0, ${vis.config.margin.top + 30})`)
+        .call(
+            d3.axisTop(boxScale).tickValues([0, ...scale.quantiles()]).tickSize(6)
+        )
+        .attr("style", "font-size: 18px")
+        .append("text")
             .attr("x", vis.width / 2)
-            .attr("y", vis.config.margin.bottom - 2)
+            .attr("y", vis.config.margin.top - 37)
+            .attr("style", "font-size: 18px")
             .attr("fill", "currentColor")
             .attr("text-anchor", "end")
-            .text(vis.label));
+            .text(vis.label);
     
     vis.map.on("mouseover", (event, d) => {
         d = index.get(d.properties.name)
