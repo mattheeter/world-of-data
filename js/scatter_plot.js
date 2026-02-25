@@ -118,6 +118,10 @@ class ScatterPlot {
         .selectAll()
         .data(vis.displayedData)
         .join("circle")
+            .filter(d => d[vis.xDataAttribute] != null)
+            .filter(d => d[vis.yDataAttribute] != null)
+            .filter(d => d[vis.xDataAttribute] != "")
+            .filter(d => d[vis.yDataAttribute] != "")
             .attr("fill", d => {
                 if (!(vis.countries.length)) {
                     return "#b311e9"
