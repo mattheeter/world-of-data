@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>D3 Project Starter Template</title>
+    <title>A World of Data</title>
     <meta charset="UTF-8">
     <link rel="icon" href="data:;base64,iVBORwOKGO=" />
     <link rel="stylesheet" href="css/styles.css">
@@ -28,10 +28,32 @@
         </select>
 
         <label>Year: </label>
+        <span id="year-slider-value-display"></span>
         <input type="range" id="year-slider" min="1970" max="2020" value="2000">
+        <script>
+            let yearSlider = document.getElementById("year-slider");
+            let yearOutput = document.getElementById("year-slider-value-display");
+
+            yearOutput.innerHTML = yearSlider.value;
+
+            yearSlider.oninput = function() {
+            yearOutput.innerHTML = this.value;
+            }
+        </script>
 
         <label>Number of Bins: </label>
+        <span id="bin-slider-value-display"></span>
         <input type="range" id="bin-slider" min="3" max="9" value="9">
+        <script>
+            let binSlider = document.getElementById("bin-slider");
+            let binOutput = document.getElementById("bin-slider-value-display");
+
+            binOutput.innerHTML = binSlider.value;
+
+            binSlider.oninput = function() {
+            binOutput.innerHTML = this.value;
+            }
+        </script>
     </div>
     <br>
     <br>

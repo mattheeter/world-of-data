@@ -174,7 +174,6 @@ class BivariateChoroplethMap {
             .filter(d => {
                 // If any point on a bar is encompassed by the brush, we include it. 
                 let [[minX, minY], [maxX, maxY]] = path.bounds(d);
-                console.log(minY, maxY)
 
                 return (
                     minX < x1 &&
